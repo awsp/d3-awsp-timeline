@@ -1,6 +1,6 @@
-var chart = new TimelineChart(new Dimension(200, 400));
-var grouping = new TimelineGroup(new Dimension(300, 400));
-var dimension = new Dimension(600, 300);
+var chart = new TimelineChart(new Dimension(450, 400));
+var grouping = new TimelineGroup(new Dimension(250, 400));
+var dimension = new Dimension(700, 400);
 var data = [
   { starting_time: new Date("2015-07-08 12:00:00").getTime(), ending_time: new Date("2015-07-08 14:00:00").getTime(), therapist: "Person A"},
   { starting_time: new Date("2015-07-08 19:00:00").getTime(), ending_time: new Date("2015-07-08 20:00:00").getTime(), therapist: "Person A"},

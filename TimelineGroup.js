@@ -4,6 +4,8 @@
  */
 var TimelineGroup = (function () {
     function TimelineGroup(dimension) {
+        this.domInstance = null; // DOM root element
+        this.svgInstance = null; // SVG root element
         if (!dimension) {
             throw new Error("Dimension is not set. ");
         }
@@ -12,31 +14,25 @@ var TimelineGroup = (function () {
     TimelineGroup.prototype.dimension = function () {
         return this.aDimension;
     };
-    TimelineGroup.prototype.origin = function (o) {
-        if (o) {
-            this.aOrigin = o;
-        }
-        return this.aOrigin;
-    };
-    TimelineGroup.prototype.cleanup = function () {
-        this.aOrigin.selectAll("rect").remove();
-    };
-    TimelineGroup.prototype.draw = function () {
-        if (!this.aData) {
-            throw new Error("No data is provided. ");
-        }
-        this.cleanup();
-        var width = this.aDimension.width();
-        this.aOrigin.selectAll("g").data(this.aData).enter().append("text").attr("transform", function (d, i) {
-            return "translate(0, " + (i + 1) * 25 + ")";
-        }).attr("width", width).attr("height", 30).text(function (d) {
-            return d.therapist;
-        });
-    };
-    TimelineGroup.prototype.init = function (gParent, data) {
-        this.aData = data;
-        this.aOrigin = gParent.append("g");
-        this.draw();
+    TimelineGroup.prototype.init = function (moduleName, gParent) {
+        this.gParent = gParent;
+        this.moduleName = moduleName;
+        var theoreticalHeight = 1000;
+        // Create a HTML element with attributes like widdth and height
+        var domInstance = this.gParent.append("div");
+        domInstance.attr("id", this.moduleName + "-grouping").attr("class", "list-module");
+        domInstance.attr("style", "width: " + this.dimension().width() + "px; height: " + this.dimension().height() + "px;");
+        // Create SVG element inside this DOM.
+        // TODO: height is using predefinied number.
+        var svgInstance = domInstance.append("svg").attr("width", this.dimension().width()).attr("height", theoreticalHeight);
+        // Background
+        var gradientDef = svgInstance.append("defs").append("linearGradient").attr("id", "bg").attr("x1", "0%").attr("x2", "0%").attr("y1", "0%").attr("y2", "100%").attr("gradientTransform", "rotate(10)").attr("spreadMethod", "pad");
+        svgInstance.append("rect").attr("width", this.dimension().width()).attr("height", theoreticalHeight).attr("style", "fill: url(#bg); ");
+        gradientDef.append("stop").attr("offset", "0%").attr("stop-color", "#f5f3f5").attr("stop-opacity", 1);
+        gradientDef.append("stop").attr("offset", "100%").attr("stop-color", "#cfcfcf").attr("stop-opacity", 1);
+        // Assignment
+        this.domInstance = domInstance;
+        this.svgInstance = svgInstance;
     };
     return TimelineGroup;
 })();

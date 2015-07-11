@@ -11,8 +11,34 @@
   overflow-x: auto;
 }
 .overflow-y {
+  overflow-y: auto;
+}
+.overflow {
+  overflow-x: auto;
+  overflow-y: auto;
+}
+.no-overflow {
+  overflow: hidden;
+}
+/**
+ * Scheduler Module
+ */
+.scheduler-module {
+  overflow-x: auto;
+  overflow-y: auto;
+}
+.scheduler-module .scheduler-inner {
+  width: 100%;
+}
+.scheduler-module .scheduler-inner .list-module {
+  float: left;
+  width: 200px;
+}
+.scheduler-module .scheduler-inner .chart-module {
+  margin-left: 200px;
+  overflow: hidden;
   overflow-x: auto;
 }
-.overflowing {
-  overflow-x: auto;
+.scheduler-module .scheduler-inner .chart-inner {
+  overflow: hidden;
 }

@@ -3,8 +3,36 @@
 .clear { clear: both; }
 
 .overflow-x { overflow-x: auto; }
-.overflow-y { overflow-x: auto; }
-.overflowing {
+.overflow-y { overflow-y: auto; }
+.overflow {
   .overflow-x;
   .overflow-y;
+}
+.no-overflow {
+  overflow: hidden;
+}
+
+
+/**
+ * Scheduler Module
+ */
+@sideBarWidth: 200px;
+.scheduler-module {
+  .overflow;
+  .scheduler-inner {
+    width: 100%;
+
+    .list-module {
+      .fl;
+      width: @sideBarWidth; // Default value.
+    }
+    .chart-module {
+      margin-left: @sideBarWidth;
+      .no-overflow;
+      .overflow-x;
+    }
+    .chart-inner {
+      .no-overflow;
+    }
+  }
 }

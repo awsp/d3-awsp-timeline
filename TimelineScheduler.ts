@@ -4,7 +4,9 @@
 ///<reference path="Dimension.ts" />
 
 /**
- * Main class to draw schdeuler
+ * Timeline Scheduler
+ *
+ * @author Anthony S. Wu <anthony@ssetp.com>
  */
 class TimelineScheduler {
   protected aDimension: Dimension;
@@ -13,19 +15,46 @@ class TimelineScheduler {
   protected aTarget: any;
   protected gParent: any;
   protected aData: any;
+  protected targetStem: string;
+
+  public scheduleModuleClass: string = "scheduler-module";
+  public scheduleInnerClass: string = "scheduler-inner";
 
   public constructor(target: string, dimension: Dimension, data: any, chart: TimelineChartInterface, grouping: TimelineGroupInterface) {
     if (!target || !dimension || !chart || !grouping) {
       throw new Error("Unable to initialize class. ");
     }
+
+    // Get target stem
+    this.targetStem = this.getStem(target);
+
+    // Chart & Groups
     this.chart = chart;
     this.grouping = grouping;
+
+    // Data
     this.aData = data;
+
+    // Timeline scheuler dimension settings
     this.aDimension = dimension;
 
+    // Begin to initialize root frame
     this.initGParent(target);
   }
 
+  /**
+   * Get stem of the target name, dispatch its front property such as . or #
+   * @param targetName
+   * @returns {string}
+   */
+  public getStem(targetName: string): string {
+    return targetName.replace("#", "").replace(".", "");
+  }
+
+  /**
+   * Get dimension
+   * @returns {Dimension}
+   */
   public dimension(): Dimension {
     return this.aDimension;
   }
@@ -40,33 +69,21 @@ class TimelineScheduler {
 
   public initGParent(target: string): void {
     this.aTarget = d3.select(target);
+    this.aTarget.attr("class", this.scheduleModuleClass).attr("style", "width: " + this.dimension().width() + "px; height: " + this.dimension().height() + "px;");
+    var aTargetInner: any = this.aTarget.append("div");
+    aTargetInner.attr("class", this.scheduleInnerClass);
 
-    // Make div
-    var stem = target.replace("#", "").replace(".", "");
-    this.aTarget.append("div").attr("id", stem + "-grouping").attr("class", "fl overflow-y")
-      .attr("style", "width: " + this.grouping.dimension().width() + "; height: " + this.grouping.dimension().height());
+    // Draw them out!
+    this.grouping.init(this.targetStem, aTargetInner);
+    this.chart.init(this.targetStem, aTargetInner, this.grouping.dimension().width());
 
-    this.aTarget.append("div").attr("id", stem + "-grouping").attr("class", "fr overflowing")
-      //.attr("style", "width: " + this.chart.dimension().width() + "; height: " + this.chart.dimension().height());
 
-    this.aTarget.append("div").attr("class", "clear");
     return ;
 
 
 
 
-    this.gParent = this.target().append("svg");
-    this.gParent.attr("width", this.dimension().width()).attr("height", this.dimension().height());
 
-    // Background
-    var gradientDef = this.gParent.append("defs").append("linearGradient")
-      .attr("id", "bg").attr("x1", "0%").attr("x2", "0%")
-      .attr("y1", "0%").attr("y2", "100%")
-      .attr("gradientTransform", "rotate(10)").attr("spreadMethod", "pad")
-    ;
-
-    gradientDef.append("stop").attr("offset", "0%").attr("stop-color", "#f5f3f5").attr("stop-opacity", 1);
-    gradientDef.append("stop").attr("offset", "100%").attr("stop-color", "#cfcfcf").attr("stop-opacity", 1);
 
     this.gParent.append("rect").attr("width", this.dimension().width()).attr("height", this.dimension().height())
       .attr("style", "fill: url(#bg); stroke: #ccc; stroke-width: 1")
