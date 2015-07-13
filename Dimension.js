@@ -1,6 +1,6 @@
 ///<reference path="DefinitelyTyped/d3/d3.d.ts" />
-var Dimension = (function () {
-    function Dimension(width, height) {
+var TwoDimensionalShape = (function () {
+    function TwoDimensionalShape(width, height) {
         this.aHeight = height;
         this.aWidth = width;
     }
@@ -9,7 +9,7 @@ var Dimension = (function () {
      * @param w
      * @returns {d3.Primitive}
      */
-    Dimension.prototype.width = function (w) {
+    TwoDimensionalShape.prototype.width = function (w) {
         if (w) {
             if (+w > 0) {
                 this.aWidth = w;
@@ -25,7 +25,7 @@ var Dimension = (function () {
      * @param h
      * @returns {d3.Primitive}
      */
-    Dimension.prototype.height = function (h) {
+    TwoDimensionalShape.prototype.height = function (h) {
         if (h) {
             if (+h > 0) {
                 this.aHeight = h;
@@ -36,6 +36,6 @@ var Dimension = (function () {
         }
         return this.aHeight;
     };
-    return Dimension;
+    return TwoDimensionalShape;
 })();
 //# sourceMappingURL=Dimension.js.map

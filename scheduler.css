@@ -20,10 +20,16 @@
 .no-overflow {
   overflow: hidden;
 }
+body {
+  font-family: "Hiragino Kaku Gothic Pro", sans-serif;
+  font-size: 13px;
+  color: #333;
+}
 /**
  * Scheduler Module
  */
 .scheduler-module {
+  border: 1px solid #ddd;
   overflow-x: auto;
   overflow-y: auto;
 }

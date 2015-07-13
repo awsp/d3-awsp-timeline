@@ -54,13 +54,11 @@ var TimelineScheduler = (function () {
         var aTargetInner = this.aTarget.append("div");
         aTargetInner.attr("class", this.scheduleInnerClass);
         // Draw them out!
-        this.grouping.init(this.targetStem, aTargetInner);
+        this.grouping.init(this.targetStem, aTargetInner, this.aData);
         this.chart.init(this.targetStem, aTargetInner, this.grouping.dimension().width());
-        return;
-        this.gParent.append("rect").attr("width", this.dimension().width()).attr("height", this.dimension().height()).attr("style", "fill: url(#bg); stroke: #ccc; stroke-width: 1");
-        this.grouping.init(this.gParent, this.aData);
     };
     TimelineScheduler.prototype.render = function () {
+        this.grouping.drawData();
     };
     return TimelineScheduler;
 })();
