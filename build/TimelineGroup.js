@@ -47,4 +47,3 @@ var TimelineGroup = (function () {
     TimelineGroup.leftPadding = 5;
     return TimelineGroup;
 })();
-//# sourceMappingURL=TimelineGroup.js.map

@@ -5,6 +5,7 @@ interface TimelineChartInterface {
   init(moduleName: string, gParent: any, width: d3.Primitive): void;
 }
 
+
 /**
  * Represent chart part of scheduler
  */

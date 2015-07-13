@@ -38,4 +38,3 @@ var TwoDimensionalShape = (function () {
     };
     return TwoDimensionalShape;
 })();
-//# sourceMappingURL=Dimension.js.map

@@ -39,4 +39,3 @@ var TimelineChart = (function () {
     };
     return TimelineChart;
 })();
-//# sourceMappingURL=TimelineChart.js.map

@@ -2,3 +2,5 @@ lib/
 .idea/
 bower_components/
 *.js.map
+.DS_Store
+.tmp/
