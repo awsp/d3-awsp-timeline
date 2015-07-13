@@ -11,8 +11,40 @@
   overflow-x: auto;
 }
 .overflow-y {
+  overflow-y: auto;
+}
+.overflow {
+  overflow-x: auto;
+  overflow-y: auto;
+}
+.no-overflow {
+  overflow: hidden;
+}
+body {
+  font-family: "Hiragino Kaku Gothic Pro", sans-serif;
+  font-size: 13px;
+  color: #333;
+}
+/**
+ * Scheduler Module
+ */
+.scheduler-module {
+  border: 1px solid #ddd;
+  overflow-x: auto;
+  overflow-y: auto;
+}
+.scheduler-module .scheduler-inner {
+  width: 100%;
+}
+.scheduler-module .scheduler-inner .list-module {
+  float: left;
+  width: 200px;
+}
+.scheduler-module .scheduler-inner .chart-module {
+  margin-left: 200px;
+  overflow: hidden;
   overflow-x: auto;
 }
-.overflowing {
-  overflow-x: auto;
+.scheduler-module .scheduler-inner .chart-inner {
+  overflow: hidden;
 }

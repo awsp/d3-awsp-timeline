@@ -1,6 +1,11 @@
 ///<reference path="DefinitelyTyped/d3/d3.d.ts" />
 
-class Dimension {
+interface Dimension {
+  width(w?: d3.Primitive): d3.Primitive;
+  height(h?: d3.Primitive): d3.Primitive;
+}
+
+class TwoDimensionalShape implements Dimension {
   protected aWidth: d3.Primitive;
   protected aHeight: d3.Primitive;
 
@@ -14,7 +19,7 @@ class Dimension {
    * @param w
    * @returns {d3.Primitive}
    */
-  public width(w: d3.Primitive): d3.Primitive {
+  public width(w?: d3.Primitive): d3.Primitive {
     if (w) {
       if (+w > 0) {
         this.aWidth = w;
@@ -31,7 +36,7 @@ class Dimension {
    * @param h
    * @returns {d3.Primitive}
    */
-  public height(h: d3.Primitive): d3.Primitive {
+  public height(h?: d3.Primitive): d3.Primitive {
     if (h) {
       if (+h > 0) {
         this.aHeight = h;

@@ -1,4 +1,4 @@
 lib/
 .idea/
-DefinitelyTyped/
 bower_components/
+*.js.map

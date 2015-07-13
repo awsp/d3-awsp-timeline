@@ -1,16 +1,23 @@
 ///<reference path="Dimension.ts" />
 
 interface TimelineGroupInterface {
-  init(gParent: any, data: any): void;
+  init(moduleName: string, gParent: any, data: any): void;
+  drawData(data?: any): void;
+  dimension(): Dimension;
 }
 
 /**
  * Represent scheduler group part
  */
 class TimelineGroup implements  TimelineGroupInterface {
-  protected aOrigin: any;
-  protected aDimension: Dimension;
-  protected aData: any;
+  protected aDimension: Dimension; // Group's dimension
+  protected gParent: any;          // The root element
+  protected moduleName: string;    // Stem of target
+  protected aData: any;            // Data
+  public domInstance: any = null;  // DOM root element
+  public svgInstance: any = null;  // SVG root element
+  public static rowHeight: number = 24;
+  public static leftPadding: number = 5;
 
   public constructor(dimension: Dimension) {
     if (!dimension) {
@@ -23,42 +30,43 @@ class TimelineGroup implements  TimelineGroupInterface {
     return this.aDimension;
   }
 
-  public origin(o: any): any {
-    if (o) {
-      this.aOrigin = o;
-    }
-    return this.aOrigin;
+  public init(moduleName: string, gParent: any, data: any): void {
+    this.gParent = gParent;
+    this.moduleName = moduleName;
+    this.aData = data;
+    var theoreticalHeight: number = 1000;
+
+    // Create a HTML element with attributes like width and height
+    var domInstance = this.gParent.append("div");
+    domInstance.attr("id", this.moduleName + "-grouping").attr("class", "list-module");
+    domInstance.attr("style", "width: " + this.dimension().width() + "px; height: " + this.dimension().height() + "px;");
+
+    // Create SVG element inside this DOM.
+    // TODO: height is using pre-definied number.
+    var svgInstance = domInstance.append("svg");
+    svgInstance.attr("width", this.dimension().width()).attr("height", theoreticalHeight);
+
+    // Assignment
+    this.domInstance = domInstance;
+    this.svgInstance = svgInstance;
   }
 
-  public cleanup(): void {
-    this.aOrigin.selectAll("rect").remove();
-  }
-
-  public draw(): void {
-    if (!this.aData) {
-      throw new Error("No data is provided. ");
+  public drawData(data: any) {
+    if (!data) {
+      data = this.aData;
     }
 
-    this.cleanup();
-
-    var width: number = <number>this.aDimension.width();
-
-    this.aOrigin.selectAll("g").data(this.aData).enter().append("text")
-      .attr("transform", function (d, i) {
-        return "translate(0, " + (i + 1) * 25 + ")";
-      })
-      .attr("width", width)
-      .attr("height", 30)
+    var svg = this.svgInstance;
+    var baseG = svg.append("g");
+    baseG.selectAll("rect").data(data).enter()
+      .append("text")
       .text(function (d) {
         return d.therapist;
       })
+      .attr("y", function (d, i) {
+        return TimelineGroup.rowHeight * i;
+      })
+      .attr("x", TimelineGroup.leftPadding)
     ;
-  }
-
-  public init(gParent: any, data: any): void {
-    this.aData = data;
-    this.aOrigin = gParent.append("g");
-
-    this.draw();
   }
 }
