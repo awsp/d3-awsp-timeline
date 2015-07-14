@@ -1,6 +1,8 @@
 .fl { float: left; }
 .fr { float: right; }
 .clear { clear: both; }
+.relative { position: relative; }
+.absolute { position: absolute; }
 
 .overflow-x { overflow-x: auto; }
 .overflow-y { overflow-y: auto; }
@@ -21,24 +23,30 @@ body {
 /**
  * Scheduler Module
  */
-@sideBarWidth: 200px;
-.scheduler-module {
-  border: 1px solid #ddd;
-  .overflow;
-  .scheduler-inner {
-    width: 100%;
+//@sideBarWidth: 200px;
+//.scheduler-module {
+//  border: 1px solid #ddd;
+//  .overflow;
+//  .scheduler-inner {
+//    width: 100%;
+//
+//    .list-module {
+//      .fl;
+//      width: @sideBarWidth; // Default value.
+//    }
+//    .chart-module {
+//      margin-left: @sideBarWidth;
+//      .no-overflow;
+//      .overflow-x;
+//    }
+//    .chart-inner {
+//      .no-overflow;
+//    }
+//  }
+//}
 
-    .list-module {
-      .fl;
-      width: @sideBarWidth; // Default value.
-    }
-    .chart-module {
-      margin-left: @sideBarWidth;
-      .no-overflow;
-      .overflow-x;
-    }
-    .chart-inner {
-      .no-overflow;
-    }
+.scheduler-module {
+  .scheduler-inner {
+    .relative;
   }
 }

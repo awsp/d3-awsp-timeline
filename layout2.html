@@ -1,0 +1,124 @@
+<html>
+    <head>
+        <title>Layout 2</title>
+        <style type="text/css">
+            * { margin: 0; padding: 0; }
+            #foo1 {
+                width: 600px;
+                height: 400px;
+                background: #eeffee;
+                overflow: hidden;
+                position: relative;
+            }
+
+            #foo2 {
+                width: 200px;
+                height: 400px;
+                float: left;
+                overflow : hidden;
+                margin-top: 21px;
+            }
+            #foo2a {
+                height: 1400px;
+                background: #ffeeee;
+            }
+
+            #foo3 {
+                margin-left: 200px;
+                height: 400px;
+            }
+            #foo3a {
+                width: 3000px;
+                height: 21px;
+                background: #eeeeff;
+            }
+            #foo3b {
+                overflow: scroll;
+                height: 379px;
+                width: 400px;
+            }
+            #foo3c {
+                width: 3000px;
+                height: 1200px;
+                margin-left: 0px;
+                background: #ffffee;
+            }
+        </style>
+        <script type="text/javascript" src="bower_components/jquery/dist/jquery.min.js"></script>
+        <script type="text/javascript">
+            (function ($) {
+                $(function () {
+                    console.log($.fn.jquery);
+                    $('#foo3b').on('scroll', function () {
+                        $('#foo2').scrollTop($(this).scrollTop());
+                    });
+                });
+            })(jQuery);
+        </script>
+    </head>
+    <body>
+        <div id="foo1">
+            <div id="foo2">
+                <div id="foo2a">
+                    Header<br>
+                    Header<br>
+                    Header<br>
+                    Header<br>
+                    Header<br>
+                    Header<br>
+                    Header<br>
+                    Header<br>
+                    Header<br>
+                    Header<br>
+                    Header<br>
+                    Header<br>
+                    Header<br>
+                    Header<br>
+                    Header<br>
+                    Header<br>
+                    Header<br>
+                    Header<br>
+                    Header<br>
+                    Header<br>
+                    Header<br>
+                    Header<br>
+                    Header<br>
+                    Header
+                </div>
+            </div>
+            <div id="foo3">
+                <div id="foo3a">
+                    Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusantium, alias aspernatur, earum et molestiae odit possimus quia ratione reiciendis rem, sed sunt? Ad debitis dolor quidem quod soluta vitae voluptate!
+                </div>
+                <div id="foo3b">
+                    <div id="foo3c">
+                        Row<br>
+                        Row<br>
+                        Row<br>
+                        Row<br>
+                        Row<br>
+                        Row<br>
+                        Row<br>
+                        Row<br>
+                        Row<br>
+                        Row<br>
+                        Row<br>
+                        Row<br>
+                        Row<br>
+                        Row<br>
+                        Row<br>
+                        Row<br>
+                        Row<br>
+                        Row<br>
+                        Row<br>
+                        Row<br>
+                        Row<br>
+                        Row<br>
+                        Row<br>
+                        Row
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

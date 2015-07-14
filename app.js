@@ -1,5 +1,15 @@
-var chart = new TimelineChart(new TwoDimensionalShape(450, 400));
-var grouping = new TimelineGroup(new TwoDimensionalShape(250, 400));
+// Configuration
+var rowHeight = 30;
+
+// TimelineChart
+var chart = new TimelineChart(new TwoDimensionalShape(600, 400));
+chart.setRowHeight(rowHeight);
+
+// Timeline Group
+var grouping = new TimelineGroup(new TwoDimensionalShape(100, 400));
+grouping.setRowHeight(rowHeight);
+
+// Scheduler
 var dimension = new TwoDimensionalShape(700, 400);
 var testData = [
   {
@@ -85,7 +95,33 @@ var testData = [
     ending_time: new Date("2015-07-08 16:30:00").getTime(),
     therapist: "Person GG",
     hotel: "Testing Hotel"
+  },
+  {
+    starting_time: new Date("2015-07-08 15:00:00").getTime(),
+    ending_time: new Date("2015-07-08 16:30:00").getTime(),
+    therapist: "Person H",
+    hotel: "Testing Hotel"
+  },
+  {
+    starting_time: new Date("2015-07-08 15:00:00").getTime(),
+    ending_time: new Date("2015-07-08 16:30:00").getTime(),
+    therapist: "Person HH",
+    hotel: "Testing Hotel"
+  },
+  {
+    starting_time: new Date("2015-07-08 15:00:00").getTime(),
+    ending_time: new Date("2015-07-08 16:30:00").getTime(),
+    therapist: "Person I",
+    hotel: "Testing Hotel"
+  },
+  {
+    starting_time: new Date("2015-07-08 15:00:00").getTime(),
+    ending_time: new Date("2015-07-08 16:30:00").getTime(),
+    therapist: "Person II",
+    hotel: "Testing Hotel"
   }
 ];
+
+// Render
 var scheduler = new TimelineScheduler("#scheduler", dimension, testData, chart, grouping);
 scheduler.render();

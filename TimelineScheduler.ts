@@ -1,4 +1,5 @@
 ///<reference path="DefinitelyTyped/d3/d3.d.ts" />
+///<reference path="DefinitelyTyped/jquery/jquery.d.ts" />
 ///<reference path="TimelineChart.ts" />
 ///<reference path="TimelineGroup.ts" />
 ///<reference path="Dimension.ts" />
@@ -13,12 +14,11 @@ class TimelineScheduler {
   public chart: TimelineChartInterface;
   public grouping: TimelineGroupInterface;
   protected aTarget: any;
-  protected gParent: any;
   protected aData: any;
   protected targetStem: string;
 
-  public scheduleModuleClass: string = "scheduler-module";
-  public scheduleInnerClass: string = "scheduler-inner";
+  public static scheduleModuleClass: string = "scheduler-module";
+  public static scheduleInnerClass: string = "scheduler-inner";
 
   public constructor(target: string, dimension: Dimension, data: any, chart: TimelineChartInterface, grouping: TimelineGroupInterface) {
     if (!target || !dimension || !chart || !grouping) {
@@ -26,7 +26,7 @@ class TimelineScheduler {
     }
 
     // Get target stem
-    this.targetStem = this.getStem(target);
+    this.targetStem = TimelineScheduler.getStem(target);
 
     // Chart & Groups
     this.chart = chart;
@@ -35,7 +35,7 @@ class TimelineScheduler {
     // Data
     this.aData = data;
 
-    // Timeline scheuler dimension settings
+    // Timeline scheduler dimension settings
     this.aDimension = dimension;
 
     // Begin to initialize root frame
@@ -47,7 +47,7 @@ class TimelineScheduler {
    * @param targetName
    * @returns {string}
    */
-  public getStem(targetName: string): string {
+  public static getStem(targetName: string): string {
     return targetName.replace("#", "").replace(".", "");
   }
 
@@ -69,13 +69,17 @@ class TimelineScheduler {
 
   public initGParent(target: string): void {
     this.aTarget = d3.select(target);
-    this.aTarget.attr("class", this.scheduleModuleClass).attr("style", "width: " + this.dimension().width() + "px; height: " + this.dimension().height() + "px;");
+    this.aTarget.attr("class", TimelineScheduler.scheduleModuleClass).attr("style", "width: " + this.dimension().width() + "px; height: " + this.dimension().height() + "px;");
     var aTargetInner: any = this.aTarget.append("div");
-    aTargetInner.attr("class", this.scheduleInnerClass);
+    aTargetInner.attr("class", TimelineScheduler.scheduleInnerClass);
 
     // Draw them out!
     this.grouping.init(this.targetStem, aTargetInner, this.aData);
-    this.chart.init(this.targetStem, aTargetInner, this.grouping.dimension().width());
+    this.chart.init(this.targetStem, aTargetInner, this.aData, this.grouping.dimension().width());
+
+    $("#" + this.targetStem + "-grouping").on("scroll", function () {
+      $("#" + this.targetStem + "-chart").scrollTop($(this).scrollTop());
+    })
   }
 
   public render(): void {
