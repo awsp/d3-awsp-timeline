@@ -3,7 +3,12 @@
 .clear { clear: both; }
 .relative { position: relative; }
 .absolute { position: absolute; }
-
+.reset-padding { padding: 0; }
+.reset-margin { margin: 0; }
+.reset {
+  .reset-padding;
+  .reset-margin;
+}
 .overflow-x { overflow-x: auto; }
 .overflow-y { overflow-y: auto; }
 .overflow {
@@ -14,39 +19,43 @@
   overflow: hidden;
 }
 
+
+html, body {
+  .reset;
+}
 body {
   font-family: "Hiragino Kaku Gothic Pro", sans-serif;
   font-size: 13px;
   color: #444;
 }
 
-/**
- * Scheduler Module
- */
-//@sideBarWidth: 200px;
-//.scheduler-module {
-//  border: 1px solid #ddd;
-//  .overflow;
-//  .scheduler-inner {
-//    width: 100%;
-//
-//    .list-module {
-//      .fl;
-//      width: @sideBarWidth; // Default value.
-//    }
-//    .chart-module {
-//      margin-left: @sideBarWidth;
-//      .no-overflow;
-//      .overflow-x;
-//    }
-//    .chart-inner {
-//      .no-overflow;
-//    }
-//  }
-//}
-
 .scheduler-module {
+  .no-overflow;
   .scheduler-inner {
-    .relative;
+    width: 100%;
+    height: 100%;
+  }
+
+  .list-module {
+    .fl;
+    .no-overflow;
+    background: #ffeeee;
+  }
+
+  .chart-module {
+    .chart-inner {
+      background: #eeffee;
+      width: 100%;
+      height: 100%;
+      .no-overflow;
+    }
+    .chart-timeline {
+      width: 100%;
+      background: #eeeeff;
+      .no-overflow;
+    }
+    .timeline-asdf {
+      .overflow;
+    }
   }
 }

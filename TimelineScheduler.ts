@@ -15,6 +15,7 @@ class TimelineScheduler {
   public grouping: TimelineGroupInterface;
   protected aTarget: any;
   protected aData: any;
+  protected targetName: string;
   protected targetStem: string;
 
   public static scheduleModuleClass: string = "scheduler-module";
@@ -24,6 +25,8 @@ class TimelineScheduler {
     if (!target || !dimension || !chart || !grouping) {
       throw new Error("Unable to initialize class. ");
     }
+
+    this.targetName = target;
 
     // Get target stem
     this.targetStem = TimelineScheduler.getStem(target);
@@ -77,9 +80,10 @@ class TimelineScheduler {
     this.grouping.init(this.targetStem, aTargetInner, this.aData);
     this.chart.init(this.targetStem, aTargetInner, this.aData, this.grouping.dimension().width());
 
-    $("#" + this.targetStem + "-grouping").on("scroll", function () {
-      $("#" + this.targetStem + "-chart").scrollTop($(this).scrollTop());
-    })
+    // Scrolling
+    $("." + TimelineChart.scrollableTimelineClass, this.targetName).on("scroll", function () {
+      $(".list-module", this.targetName).scrollTop($(this).scrollTop());
+    });
   }
 
   public render(): void {

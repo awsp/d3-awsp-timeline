@@ -1,5 +1,5 @@
 // Configuration
-var rowHeight = 30;
+var rowHeight = 40;
 
 // TimelineChart
 var chart = new TimelineChart(new TwoDimensionalShape(600, 400));

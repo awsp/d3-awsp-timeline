@@ -13,6 +13,7 @@ var TimelineScheduler = (function () {
         if (!target || !dimension || !chart || !grouping) {
             throw new Error("Unable to initialize class. ");
         }
+        this.targetName = target;
         // Get target stem
         this.targetStem = TimelineScheduler.getStem(target);
         // Chart & Groups
@@ -55,8 +56,9 @@ var TimelineScheduler = (function () {
         // Draw them out!
         this.grouping.init(this.targetStem, aTargetInner, this.aData);
         this.chart.init(this.targetStem, aTargetInner, this.aData, this.grouping.dimension().width());
-        $("#" + this.targetStem + "-grouping").on("scroll", function () {
-            $("#" + this.targetStem + "-chart").scrollTop($(this).scrollTop());
+        // Scrolling
+        $("." + TimelineChart.scrollableTimelineClass, this.targetName).on("scroll", function () {
+            $(".list-module", this.targetName).scrollTop($(this).scrollTop());
         });
     };
     TimelineScheduler.prototype.render = function () {

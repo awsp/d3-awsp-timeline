@@ -1,5 +1,6 @@
 ///<reference path="DefinitelyTyped/underscore/underscore.d.ts" />
 ///<reference path="Dimension.ts" />
+///<reference path="TimelineChart.ts" />
 
 interface TimelineGroupInterface {
   init(moduleName: string, gParent: any, data: any): void;
@@ -22,6 +23,7 @@ class TimelineGroup implements TimelineGroupInterface {
   protected rowHeight: number = 21;
   public static leftPadding: number = 5;
   protected aHeight: number = 0;      // Overall height
+
 
   public constructor(dimension: Dimension) {
     if (!dimension) {
@@ -52,7 +54,7 @@ class TimelineGroup implements TimelineGroupInterface {
     // Create a HTML element with attributes like width and height
     var domInstance = this.gParent.append("div");
     domInstance.attr("id", this.moduleName + "-grouping").attr("class", "list-module");
-    domInstance.attr("style", "width: " + this.dimension().width() + "px; height: " + theoreticalHeight + "px;");
+    domInstance.attr("style", "width: " + this.dimension().width() + "px; height: " + this.dimension().height() + "px; margin-top: " + TimelineChart.timelineHeight + "px;");
 
     // Create SVG element inside this DOM.
     // TODO: height is using pre-defined number.

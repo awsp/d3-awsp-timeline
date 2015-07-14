@@ -1,5 +1,6 @@
 ///<reference path="DefinitelyTyped/underscore/underscore.d.ts" />
 ///<reference path="Dimension.ts" />
+///<reference path="TimelineChart.ts" />
 /**
  * Represent scheduler group part
  */
@@ -32,7 +33,7 @@ var TimelineGroup = (function () {
         // Create a HTML element with attributes like width and height
         var domInstance = this.gParent.append("div");
         domInstance.attr("id", this.moduleName + "-grouping").attr("class", "list-module");
-        domInstance.attr("style", "width: " + this.dimension().width() + "px; height: " + theoreticalHeight + "px;");
+        domInstance.attr("style", "width: " + this.dimension().width() + "px; height: " + this.dimension().height() + "px; margin-top: " + TimelineChart.timelineHeight + "px;");
         // Create SVG element inside this DOM.
         // TODO: height is using pre-defined number.
         var svgInstance = domInstance.append("svg");
