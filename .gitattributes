@@ -1,3 +1,1 @@
-*.js.map linguist-vendored=false
-build/*.js linguist-vendored=false
-build/*.css linguist-vendored=false
+build/* linguist-vendored
