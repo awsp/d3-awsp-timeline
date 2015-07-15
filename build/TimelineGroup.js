@@ -46,7 +46,7 @@ var TimelineGroup = (function () {
         this.svgInstance = svgInstance;
     };
     TimelineGroup.prototype.drawData = function (data) {
-        // Allow data to override original value. 
+        // Allow data to override original value.
         if (!data) {
             data = this.aData;
         }
@@ -61,7 +61,7 @@ var TimelineGroup = (function () {
             return i % 2 === 0 ? "even" : "odd";
         });
         gEnter.append("text").text(function (d) {
-            return d[0].therapist;
+            return d[0].worker;
         }).attr("dominant-baseline", "central").attr("x", function (d, i) {
             return 5;
         }).attr("dy", function (d, i) {

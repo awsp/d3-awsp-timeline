@@ -125,14 +125,15 @@ class TimelineChart implements TimelineChartInterface {
   }
 
   public drawData(): void {
-    var chartG = this.chartSvg.append("g");
-    chartG.selectAll("rect")
-      .data(d3.values(this.aData)).enter().append("rect")
-      .attr("width", 200)
-      .attr("height", 31)
-      .attr("y", (d, i) => {
-        return i * 30;
-      })
-    ;
+    var baseG = this.chartSvg.append("g").attr("transform", "translate(0, 0)");
+    var g = baseG.selectAll("g").data(d3.values(this.aData));
+    var rowHeight = this.rowHeight;
+    var gEnter = g.enter().append("g").attr("class", "chart-row").attr("transform", (d, i) => {
+      return "translate(0, " + rowHeight * i + ")";
+    });
+
+    gEnter.append("rect").attr("width", 200).attr("height", rowHeight).attr("x", (d, i) => {
+      return +Math.random().toFixed(2) * 100;
+    });
   }
 }

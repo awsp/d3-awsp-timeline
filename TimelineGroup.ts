@@ -74,7 +74,7 @@ class TimelineGroup implements TimelineGroupInterface {
   }
 
   public drawData(data?: any) {
-    // Allow data to override original value. 
+    // Allow data to override original value.
     if (!data) {
       data = this.aData;
     }
@@ -96,7 +96,7 @@ class TimelineGroup implements TimelineGroupInterface {
     ;
     gEnter.append("text")
       .text((d: any) => {
-        return d[0].therapist;
+        return d[0].worker;
       })
       .attr("dominant-baseline", "central")
       .attr("x", (d: any, i: number) => {
