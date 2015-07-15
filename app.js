@@ -1,14 +1,6 @@
 // Configuration
 var rowHeight = 40;
 
-// TimelineChart
-var chart = new TimelineChart(new TwoDimensionalShape(600, 400));
-chart.setRowHeight(rowHeight);
-
-// Timeline Group
-var grouping = new TimelineGroup(new TwoDimensionalShape(100, 400));
-grouping.setRowHeight(rowHeight);
-
 // Scheduler
 var dimension = new TwoDimensionalShape(700, 400);
 var testData = [
@@ -121,6 +113,17 @@ var testData = [
     hotel: "Testing Hotel"
   }
 ];
+
+
+
+// TimelineChart
+var chart = new TimelineChart(new TwoDimensionalShape(600, 400));
+chart.setRowHeight(rowHeight);
+
+
+// Timeline Group
+var grouping = new TimelineGroup(new TwoDimensionalShape(100, 400));
+grouping.setRowHeight(rowHeight);
 
 
 // Render

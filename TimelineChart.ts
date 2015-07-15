@@ -33,6 +33,9 @@ class TimelineChart implements TimelineChartInterface {
 
   // Storing Current Height
   protected aHeight: number;
+  
+  // Storing data
+  protected aData: any;
 
   // Timeline CSS Class Name, used to do some jQuery stuff.
   public static scrollableTimelineClass: string = "timeline-asdf";
@@ -68,6 +71,7 @@ class TimelineChart implements TimelineChartInterface {
   public init(moduleName: string, gParent: any, data: any, marginLeft: number): void {
     this.gParent = gParent;
     this.moduleName = moduleName;
+    this.aData = data; 
     var theoreticalWidth: number = 2400; // TODO: temp value for width: 2400
     var theoreticalHeight: number = this.aHeight = Object.keys(data).length * this.rowHeight;
 
@@ -116,16 +120,19 @@ class TimelineChart implements TimelineChartInterface {
     var xGrid = d3.svg.axis().scale(xGridScale).orient("bottom").ticks(ticks).tickFormat("").tickSize(-theoreticalWidth, 0);
     chartSvg.append("g").attr("class", "grid").attr("transform", "translate(0," + theoreticalWidth + ")").call(xGrid);
 
-    var yGridScale = d3.scale.linear().domain([0, theoreticalWidth]).range([0, theoreticalWidth]);
-    var yGrid = d3.svg.axis().scale(yGridScale).orient("left").ticks(ticks).tickFormat("").tickSize(-theoreticalWidth, 0);
-    chartSvg.append("g").attr("class", "grid").attr("transform", "translate(0," + theoreticalWidth + ")").call(yGrid);
-
-
     this.chartModuleDom = chartModuleDom;
     this.chartSvg = chartSvg;
   }
 
   public drawData(): void {
-
+    var chartG = this.chartSvg.append("g");
+    chartG.selectAll("rect")
+      .data(d3.values(this.aData)).enter().append("rect")
+      .attr("width", 200)
+      .attr("height", 31)
+      .attr("y", (d, i) => {
+        return i * 30;
+      })
+    ;
   }
 }

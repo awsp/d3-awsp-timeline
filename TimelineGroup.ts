@@ -73,24 +73,39 @@ class TimelineGroup implements TimelineGroupInterface {
     this.svgInstance = svgInstance;
   }
 
-  public drawData(data: any) {
+  public drawData(data?: any) {
+    // Allow data to override original value. 
     if (!data) {
       data = this.aData;
     }
 
     var svg = this.svgInstance;
-    var baseG = svg.append("g").attr("transform", "translate(0, " + TimelineChart.timelineHeight + ")");
+    var baseG = svg.append("g").attr("transform", "translate(0, 0)");
     var rowHeight = this.rowHeight;
 
-    baseG.selectAll("rect").data(d3.values(data)).enter()
-      .append("text")
-      .text(function (d) {
+    var g = baseG.selectAll("g").data(d3.values(data));
+    var gEnter = g.enter().append("g").attr("transform", (d: any, i: number) => {
+      return "translate(0, " + rowHeight * i + ")";
+    });
+
+    gEnter.append("rect")
+      .attr("height", rowHeight).attr("width", this.dimension().width())
+      .attr("class", (d: any, i: number) => {
+        return i % 2 === 0 ? "even" : "odd";
+      })
+    ;
+    gEnter.append("text")
+      .text((d: any) => {
         return d[0].therapist;
       })
-      .attr("y", function (d, i) {
-        return rowHeight * i;
+      .attr("dominant-baseline", "central")
+      .attr("x", (d: any, i: number) => {
+        return 5;
       })
-      .attr("x", TimelineGroup.leftPadding)
+      .attr("dy", (d: any, i: number) => {
+        return rowHeight / 2;
+      })
+      .attr("text-anchor", "start")
     ;
   }
 }

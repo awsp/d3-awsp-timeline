@@ -33,6 +33,7 @@ var TimelineChart = (function () {
     TimelineChart.prototype.init = function (moduleName, gParent, data, marginLeft) {
         this.gParent = gParent;
         this.moduleName = moduleName;
+        this.aData = data;
         var theoreticalWidth = 2400; // TODO: temp value for width: 2400
         var theoreticalHeight = this.aHeight = Object.keys(data).length * this.rowHeight;
         // `chart-module` DOM
@@ -67,13 +68,14 @@ var TimelineChart = (function () {
         var xGridScale = d3.scale.linear().domain([0, theoreticalWidth]).range([0, theoreticalWidth]);
         var xGrid = d3.svg.axis().scale(xGridScale).orient("bottom").ticks(ticks).tickFormat("").tickSize(-theoreticalWidth, 0);
         chartSvg.append("g").attr("class", "grid").attr("transform", "translate(0," + theoreticalWidth + ")").call(xGrid);
-        var yGridScale = d3.scale.linear().domain([0, theoreticalWidth]).range([0, theoreticalWidth]);
-        var yGrid = d3.svg.axis().scale(yGridScale).orient("left").ticks(ticks).tickFormat("").tickSize(-theoreticalWidth, 0);
-        chartSvg.append("g").attr("class", "grid").attr("transform", "translate(0," + theoreticalWidth + ")").call(yGrid);
         this.chartModuleDom = chartModuleDom;
         this.chartSvg = chartSvg;
     };
     TimelineChart.prototype.drawData = function () {
+        var chartG = this.chartSvg.append("g");
+        chartG.selectAll("rect").data(d3.values(this.aData)).enter().append("rect").attr("width", 200).attr("height", 31).attr("y", function (d, i) {
+            return i * 30;
+        });
     };
     // Timeline CSS Class Name, used to do some jQuery stuff.
     TimelineChart.scrollableTimelineClass = "timeline-asdf";
