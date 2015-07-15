@@ -1,5 +1,6 @@
 ///<reference path="DefinitelyTyped/d3/d3.d.ts" />
 ///<reference path="DefinitelyTyped/jquery/jquery.d.ts" />
+///<reference path="DefinitelyTyped/underscore/underscore.d.ts" />
 ///<reference path="TimelineChart.ts" />
 ///<reference path="TimelineGroup.ts" />
 ///<reference path="Dimension.ts" />
@@ -48,6 +49,19 @@ var TimelineScheduler = (function () {
     TimelineScheduler.prototype.target = function () {
         return this.aTarget;
     };
+    /**
+     * Convert data based on a groupBy key.
+     * @param data
+     * @param groupBy
+     * @returns {Dictionary<T[]>|Dictionary<TValue[]>|_.Dictionary<T[]>}
+     */
+    TimelineScheduler.processData = function (data, groupBy) {
+        return _.groupBy(data, groupBy);
+    };
+    /**
+     * Initialize G parent.
+     * @param target
+     */
     TimelineScheduler.prototype.initGParent = function (target) {
         this.aTarget = d3.select(target);
         this.aTarget.attr("class", TimelineScheduler.scheduleModuleClass).attr("style", "width: " + this.dimension().width() + "px; height: " + this.dimension().height() + "px;");
@@ -58,13 +72,20 @@ var TimelineScheduler = (function () {
         this.chart.init(this.targetStem, aTargetInner, this.aData, this.grouping.dimension().width());
         // Scrolling
         $("." + TimelineChart.scrollableTimelineClass, this.targetName).on("scroll", function () {
-            $(".list-module", this.targetName).scrollTop($(this).scrollTop());
+            $("." + TimelineScheduler.listModuleClass, this.targetName).scrollTop($(this).scrollTop());
+            $("." + TimelineScheduler.chartTimelineClass, this.targetName).scrollLeft($(this).scrollLeft());
         });
     };
+    /**
+     * Main renderer
+     */
     TimelineScheduler.prototype.render = function () {
         this.grouping.drawData();
+        this.chart.drawData();
     };
     TimelineScheduler.scheduleModuleClass = "scheduler-module";
     TimelineScheduler.scheduleInnerClass = "scheduler-inner";
+    TimelineScheduler.listModuleClass = "list-module";
+    TimelineScheduler.chartTimelineClass = "chart-timeline";
     return TimelineScheduler;
 })();

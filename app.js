@@ -122,6 +122,7 @@ var testData = [
   }
 ];
 
+
 // Render
-var scheduler = new TimelineScheduler("#scheduler", dimension, testData, chart, grouping);
+var scheduler = new TimelineScheduler("#scheduler", dimension, TimelineScheduler.processData(testData, "therapist"), chart, grouping);
 scheduler.render();

@@ -25,15 +25,18 @@ var TimelineGroup = (function () {
     TimelineGroup.prototype.setRowHeight = function (height) {
         this.rowHeight = height;
     };
+    TimelineGroup.prototype.getRowHeight = function () {
+        return this.rowHeight;
+    };
     TimelineGroup.prototype.init = function (moduleName, gParent, data) {
         this.gParent = gParent;
         this.moduleName = moduleName;
         this.aData = data;
-        var theoreticalHeight = this.aHeight = data.length * this.rowHeight;
+        var theoreticalHeight = this.aHeight = Object.keys(data).length * this.rowHeight;
         // Create a HTML element with attributes like width and height
         var domInstance = this.gParent.append("div");
         domInstance.attr("id", this.moduleName + "-grouping").attr("class", "list-module");
-        domInstance.attr("style", "width: " + this.dimension().width() + "px; height: " + this.dimension().height() + "px; margin-top: " + TimelineChart.timelineHeight + "px;");
+        domInstance.attr("style", "width: " + this.dimension().width() + "px; " + "height: " + (this.dimension().height() - TimelineChart.timelineHeight) + "px; " + "margin-top: " + TimelineChart.timelineHeight + "px;");
         // Create SVG element inside this DOM.
         // TODO: height is using pre-defined number.
         var svgInstance = domInstance.append("svg");
@@ -47,10 +50,10 @@ var TimelineGroup = (function () {
             data = this.aData;
         }
         var svg = this.svgInstance;
-        var baseG = svg.append("g");
+        var baseG = svg.append("g").attr("transform", "translate(0, " + TimelineChart.timelineHeight + ")");
         var rowHeight = this.rowHeight;
-        baseG.selectAll("rect").data(data).enter().append("text").text(function (d) {
-            return d.therapist;
+        baseG.selectAll("rect").data(d3.values(data)).enter().append("text").text(function (d) {
+            return d[0].therapist;
         }).attr("y", function (d, i) {
             return rowHeight * i;
         }).attr("x", TimelineGroup.leftPadding);

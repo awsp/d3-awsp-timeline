@@ -1,5 +1,6 @@
 ///<reference path="DefinitelyTyped/d3/d3.d.ts" />
 ///<reference path="DefinitelyTyped/jquery/jquery.d.ts" />
+///<reference path="DefinitelyTyped/underscore/underscore.d.ts" />
 ///<reference path="TimelineChart.ts" />
 ///<reference path="TimelineGroup.ts" />
 ///<reference path="Dimension.ts" />
@@ -20,6 +21,8 @@ class TimelineScheduler {
 
   public static scheduleModuleClass: string = "scheduler-module";
   public static scheduleInnerClass: string = "scheduler-inner";
+  public static listModuleClass: string = "list-module";
+  public static chartTimelineClass: string = "chart-timeline";
 
   public constructor(target: string, dimension: Dimension, data: any, chart: TimelineChartInterface, grouping: TimelineGroupInterface) {
     if (!target || !dimension || !chart || !grouping) {
@@ -70,6 +73,20 @@ class TimelineScheduler {
     return this.aTarget;
   }
 
+  /**
+   * Convert data based on a groupBy key.
+   * @param data
+   * @param groupBy
+   * @returns {Dictionary<T[]>|Dictionary<TValue[]>|_.Dictionary<T[]>}
+   */
+  public static processData(data: any, groupBy: string): any {
+    return _.groupBy(data, groupBy);
+  }
+
+  /**
+   * Initialize G parent.
+   * @param target
+   */
   public initGParent(target: string): void {
     this.aTarget = d3.select(target);
     this.aTarget.attr("class", TimelineScheduler.scheduleModuleClass).attr("style", "width: " + this.dimension().width() + "px; height: " + this.dimension().height() + "px;");
@@ -82,12 +99,17 @@ class TimelineScheduler {
 
     // Scrolling
     $("." + TimelineChart.scrollableTimelineClass, this.targetName).on("scroll", function () {
-      $(".list-module", this.targetName).scrollTop($(this).scrollTop());
+      $("." + TimelineScheduler.listModuleClass, this.targetName).scrollTop($(this).scrollTop());
+      $("." + TimelineScheduler.chartTimelineClass, this.targetName).scrollLeft($(this).scrollLeft());
     });
   }
 
+  /**
+   * Main renderer
+   */
   public render(): void {
     this.grouping.drawData();
+    this.chart.drawData();
   }
 
 }
