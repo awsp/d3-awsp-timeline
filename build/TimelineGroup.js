@@ -46,17 +46,27 @@ var TimelineGroup = (function () {
         this.svgInstance = svgInstance;
     };
     TimelineGroup.prototype.drawData = function (data) {
+        // Allow data to override original value.
         if (!data) {
             data = this.aData;
         }
         var svg = this.svgInstance;
-        var baseG = svg.append("g").attr("transform", "translate(0, " + TimelineChart.timelineHeight + ")");
+        var baseG = svg.append("g").attr("transform", "translate(0, 0)");
         var rowHeight = this.rowHeight;
-        baseG.selectAll("rect").data(d3.values(data)).enter().append("text").text(function (d) {
-            return d[0].therapist;
-        }).attr("y", function (d, i) {
-            return rowHeight * i;
-        }).attr("x", TimelineGroup.leftPadding);
+        var g = baseG.selectAll("g").data(d3.values(data));
+        var gEnter = g.enter().append("g").attr("transform", function (d, i) {
+            return "translate(0, " + rowHeight * i + ")";
+        });
+        gEnter.append("rect").attr("height", rowHeight).attr("width", this.dimension().width()).attr("class", function (d, i) {
+            return i % 2 === 0 ? "even" : "odd";
+        });
+        gEnter.append("text").text(function (d) {
+            return d[0].worker;
+        }).attr("dominant-baseline", "central").attr("x", function (d, i) {
+            return 5;
+        }).attr("dy", function (d, i) {
+            return rowHeight / 2;
+        }).attr("text-anchor", "start");
     };
     TimelineGroup.leftPadding = 5;
     return TimelineGroup;

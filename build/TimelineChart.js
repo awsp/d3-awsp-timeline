@@ -1,4 +1,5 @@
 ///<reference path="DefinitelyTyped/d3/d3.d.ts" />
+///<reference path="DefinitelyTyped/underscore/underscore.d.ts" />
 ///<reference path="Dimension.ts" />
 ///<reference path="TimelineGroup.ts" />
 /**
@@ -33,6 +34,7 @@ var TimelineChart = (function () {
     TimelineChart.prototype.init = function (moduleName, gParent, data, marginLeft) {
         this.gParent = gParent;
         this.moduleName = moduleName;
+        this.aData = data;
         var theoreticalWidth = 2400; // TODO: temp value for width: 2400
         var theoreticalHeight = this.aHeight = Object.keys(data).length * this.rowHeight;
         // `chart-module` DOM
@@ -67,13 +69,78 @@ var TimelineChart = (function () {
         var xGridScale = d3.scale.linear().domain([0, theoreticalWidth]).range([0, theoreticalWidth]);
         var xGrid = d3.svg.axis().scale(xGridScale).orient("bottom").ticks(ticks).tickFormat("").tickSize(-theoreticalWidth, 0);
         chartSvg.append("g").attr("class", "grid").attr("transform", "translate(0," + theoreticalWidth + ")").call(xGrid);
-        var yGridScale = d3.scale.linear().domain([0, theoreticalWidth]).range([0, theoreticalWidth]);
-        var yGrid = d3.svg.axis().scale(yGridScale).orient("left").ticks(ticks).tickFormat("").tickSize(-theoreticalWidth, 0);
-        chartSvg.append("g").attr("class", "grid").attr("transform", "translate(0," + theoreticalWidth + ")").call(yGrid);
         this.chartModuleDom = chartModuleDom;
         this.chartSvg = chartSvg;
     };
+    TimelineChart.prototype.onMouseOver = function (svg, data, i) {
+    };
+    TimelineChart.prototype.onMouseOut = function (svg, data, i) {
+    };
+    TimelineChart.prototype.titleOnHover = function (svg) {
+    };
     TimelineChart.prototype.drawData = function () {
+        var baseG = this.chartSvg.append("g").attr("transform", "translate(0, 0)");
+        var g = baseG.selectAll("g").data(d3.values(this.aData));
+        var rowHeight = this.rowHeight;
+        var gEnter = g.enter().append("g").attr("class", "chart-row").attr("transform", function (d, i) {
+            return "translate(0, " + rowHeight * i + ")";
+        });
+        var blockG = gEnter.selectAll("g").data(function (d, i) {
+            return d;
+        }).enter().append("g").attr("transform", function (d) {
+            return "translate(" + Math.floor(Math.random() * 2000) + ", 0)";
+        }).attr("class", "block").on("mouseover", function (d, i) {
+            _this.onMouseOver(this, d, i);
+        }).on("mouseout", function (d, i) {
+            _this.onMouseOut(this, d, i);
+        });
+        var _this = this;
+        blockG.append("rect").attr("fill", function (d) {
+            return d.type.backgroundColor;
+        }).attr("height", function (d) {
+            return d.type.height;
+        }).attr("width", function (d) {
+            // TODO: use time to calculate, hardcoded for now
+            return 100;
+        }).attr("stroke-width", function (d) {
+            return d.type.hasOwnProperty("strokeWidth") ? d.type.strokeWidth : 0;
+        }).attr("stroke", function (d) {
+            return d.type.hasOwnProperty("stroke") ? d.type.stroke : 0;
+        }).attr("rx", function (d) {
+            return d.type.hasOwnProperty("round") ? d.type.round : 0;
+        }).attr("fill-opacity", function (d) {
+            return d.type.opacity;
+        }).attr("stroke-opacity", function (d) {
+            return d.type.opacity;
+        }).attr("y", function (d) {
+            if (d.type.height < rowHeight) {
+                return (rowHeight - d.type.height) / 2;
+            }
+        });
+        var titleDesc = blockG.filter(function (d) {
+            if (d.type.hasOwnProperty("hasLabel") && d.type.hasLabel === true) {
+                return true;
+            }
+            return false;
+        }).append("svg:title");
+        this.titleOnHover(titleDesc);
+        blockG.filter(function (d) {
+            if (d.type.hasOwnProperty("hasLabel") && d.type.hasLabel === true) {
+                return true;
+            }
+            return false;
+        }).append("text").text(function (d) {
+            if (d.type.hasLabel) {
+                return d.place;
+            }
+            return "";
+        }).attr("dx", function (d) {
+            return d.type.hasOwnProperty("round") ? d.type.round + 3 : 3;
+        }).attr("dy", function (d) {
+            return rowHeight / 2;
+        }).attr("style", function (d) {
+            return "fill: " + d.type.foregroundColor + "; font-size: " + (d.type.hasOwnProperty("fontSize") ? d.type.fontSize : 12) + "px";
+        }).attr("dominant-baseline", "central");
     };
     // Timeline CSS Class Name, used to do some jQuery stuff.
     TimelineChart.scrollableTimelineClass = "timeline-asdf";

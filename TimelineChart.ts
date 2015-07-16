@@ -1,4 +1,5 @@
 ///<reference path="DefinitelyTyped/d3/d3.d.ts" />
+///<reference path="DefinitelyTyped/underscore/underscore.d.ts" />
 ///<reference path="Dimension.ts" />
 ///<reference path="TimelineGroup.ts" />
 
@@ -33,6 +34,9 @@ class TimelineChart implements TimelineChartInterface {
 
   // Storing Current Height
   protected aHeight: number;
+  
+  // Storing data
+  protected aData: any;
 
   // Timeline CSS Class Name, used to do some jQuery stuff.
   public static scrollableTimelineClass: string = "timeline-asdf";
@@ -68,6 +72,7 @@ class TimelineChart implements TimelineChartInterface {
   public init(moduleName: string, gParent: any, data: any, marginLeft: number): void {
     this.gParent = gParent;
     this.moduleName = moduleName;
+    this.aData = data; 
     var theoreticalWidth: number = 2400; // TODO: temp value for width: 2400
     var theoreticalHeight: number = this.aHeight = Object.keys(data).length * this.rowHeight;
 
@@ -116,16 +121,103 @@ class TimelineChart implements TimelineChartInterface {
     var xGrid = d3.svg.axis().scale(xGridScale).orient("bottom").ticks(ticks).tickFormat("").tickSize(-theoreticalWidth, 0);
     chartSvg.append("g").attr("class", "grid").attr("transform", "translate(0," + theoreticalWidth + ")").call(xGrid);
 
-    var yGridScale = d3.scale.linear().domain([0, theoreticalWidth]).range([0, theoreticalWidth]);
-    var yGrid = d3.svg.axis().scale(yGridScale).orient("left").ticks(ticks).tickFormat("").tickSize(-theoreticalWidth, 0);
-    chartSvg.append("g").attr("class", "grid").attr("transform", "translate(0," + theoreticalWidth + ")").call(yGrid);
-
-
     this.chartModuleDom = chartModuleDom;
     this.chartSvg = chartSvg;
   }
 
-  public drawData(): void {
+  public onMouseOver(svg: any, data: any, i: number): void {}
+  public onMouseOut(svg: any, data: any, i: number): void {}
+  public titleOnHover(svg: any): void {}
 
+  public drawData(): void {
+    var baseG = this.chartSvg.append("g").attr("transform", "translate(0, 0)");
+    var g = baseG.selectAll("g").data(d3.values(this.aData));
+    var rowHeight = this.rowHeight;
+    var gEnter = g.enter().append("g").attr("class", "chart-row").attr("transform", (d, i) => {
+      return "translate(0, " + rowHeight * i + ")";
+    });
+
+    var blockG = gEnter.selectAll("g").data((d: any, i: number) => {
+      return d;
+    }).enter()
+      .append("g")
+      .attr("transform", (d) => {
+        return "translate(" + Math.floor(Math.random() * 2000) +  ", 0)";
+      })
+      .attr("class", "block")
+      .on("mouseover", function (d: any, i: number) {
+        _this.onMouseOver(this, d, i);
+      })
+      .on("mouseout", function (d: any, i: number) {
+        _this.onMouseOut(this, d, i);
+      })
+    ;
+    var _this = this;
+
+    blockG.append("rect")
+      .attr("fill", (d) => {
+        return d.type.backgroundColor;
+      })
+      .attr("height", (d) => {
+        return d.type.height;
+      })
+      .attr("width", (d) => {
+        // TODO: use time to calculate, hardcoded for now
+        return 100;
+      })
+      .attr("stroke-width", (d) => {
+        return d.type.hasOwnProperty("strokeWidth") ? d.type.strokeWidth : 0;
+      })
+      .attr("stroke", (d) => {
+        return d.type.hasOwnProperty("stroke") ? d.type.stroke : 0;
+      })
+      .attr("rx", (d) => {
+        return d.type.hasOwnProperty("round") ? d.type.round : 0;
+      })
+      .attr("fill-opacity", (d) => {
+        return d.type.opacity;
+      })
+      .attr("stroke-opacity", (d) => {
+        return d.type.opacity;
+      })
+      .attr("y", (d) => {
+        if (d.type.height < rowHeight) {
+          return (rowHeight - d.type.height) / 2;
+        }
+      })
+    ;
+
+    var titleDesc = blockG.filter((d) => {
+      if (d.type.hasOwnProperty("hasLabel") && d.type.hasLabel === true) {
+        return true;
+      }
+      return false;
+    }).append("svg:title");
+
+    this.titleOnHover(titleDesc);
+
+    blockG.filter((d) => {
+      if (d.type.hasOwnProperty("hasLabel") && d.type.hasLabel === true) {
+        return true;
+      }
+      return false;
+    }).append("text")
+      .text((d) => {
+        if (d.type.hasLabel) {
+          return d.place;
+        }
+        return "";
+      })
+      .attr("dx", (d) => {
+        return d.type.hasOwnProperty("round") ? d.type.round + 3 : 3;
+      })
+      .attr("dy", (d) => {
+        return rowHeight / 2;
+      })
+      .attr("style", (d) => {
+        return "fill: " + d.type.foregroundColor + "; font-size: " + (d.type.hasOwnProperty("fontSize") ? d.type.fontSize : 12) + "px";
+      })
+      .attr("dominant-baseline", "central")
+    ;
   }
 }

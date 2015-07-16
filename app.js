@@ -1,128 +1,116 @@
 // Configuration
 var rowHeight = 40;
 
+// Types of Bar, order matters. [2] is on top of [1] and is on top of [0].
+var types = [
+  {
+    id: "availability",
+    name: "Availabilities",
+    backgroundColor: "#ccffcc",
+    foregroundColor: "#447744",
+    opacity: 0.5,
+    height: rowHeight,
+    hasLabel: false
+  },
+  {
+    id: "work",
+    name: "Working Schedule",
+    backgroundColor: "#4D82CC",
+    foregroundColor: "#fff",
+    opacity: 0.90,
+    height: 24,
+    stroke: "#4D82CC",
+    strokeWidth: 3,
+    round: 3,
+    hasLabel: true,
+    fontSize: 11
+  }
+];
+
+// Scheduler
+var dimension = new TwoDimensionalShape(700, 400);
+var workers = [
+  {
+    id: "person-a",
+    firstName: "A",
+    lastName: "Person"
+  },
+  {
+    id: "person-b",
+    firstName: "B",
+    lastName: "Person"
+  },
+  {
+    id: "person-c",
+    firstName: "C",
+    lastName: "Person"
+  }
+]
+var generateRandomTimeData = function (date, n, workers) {
+  var data = [];
+
+  for (var i = 0; i < n; i++) {
+    var sTimeFactor = +((Math.random() * 18).toFixed(0)); // set latest possibility to 18
+    var startingTime = new Date(date + " " + sTimeFactor + ":00:00");
+    var eTimeFactor = sTimeFactor + (+((Math.random() * 4).toFixed(0)));
+    var endingTime = new Date(date + " " + eTimeFactor + ":00:00");
+
+    data.push({
+      starting_time: startingTime.getTime(),
+      ending_time: endingTime.getTime(),
+      worker: workers[Math.floor(Math.random() * workers.length)].id,
+      place: "Working Place " + (Math.random() * 10).toFixed(0),
+      type: types[Math.floor(Math.random() * types.length)]
+    });
+  }
+  return data;
+};
+var testData = generateRandomTimeData("2015-07-15", 10, workers);
+var data = TimelineScheduler.processData(testData, "worker");
+
+
 // TimelineChart
 var chart = new TimelineChart(new TwoDimensionalShape(600, 400));
 chart.setRowHeight(rowHeight);
+chart.onMouseOver = function (self, data, i) {
+  if (data.type.id === "work") {
+    d3.select(self).select("rect")
+      .transition()
+      .duration(300)
+      .attr({
+        "fill": "#5390E0",
+        "stroke": "#5390E0"
+      })
+    ;
+  }
+};
+chart.onMouseOut = function (self, data, i) {
+  if (data.type.id === "work") {
+    d3.select(self).select("rect")
+      .transition()
+      .duration(150)
+      .attr({
+        "fill": "#4D82CC",
+        "stroke": "#4D82CC"
+      })
+    ;
+  }
+};
+chart.titleOnHover = function (self) {
+  var label = self.attr("class", "block-label");
+  label.append("tspan")
+    .text(function (d) {
+      return d.place;
+    })
+  ;
+};
+
 
 // Timeline Group
 var grouping = new TimelineGroup(new TwoDimensionalShape(100, 400));
 grouping.setRowHeight(rowHeight);
 
-// Scheduler
-var dimension = new TwoDimensionalShape(700, 400);
-var testData = [
-  {
-    starting_time: new Date("2015-07-08 12:00:00").getTime(),
-    ending_time: new Date("2015-07-08 14:00:00").getTime(),
-    therapist: "Person A",
-    hotel: "Testing Hotel"
-  },
-  {
-    starting_time: new Date("2015-07-08 19:00:00").getTime(),
-    ending_time: new Date("2015-07-08 20:00:00").getTime(),
-    therapist: "Person AA",
-    hotel: "Testing Hotel"
-  },
-  {
-    starting_time: new Date("2015-07-08 15:00:00").getTime(),
-    ending_time: new Date("2015-07-08 16:30:00").getTime(),
-    therapist: "Person B",
-    hotel: "Testing Hotel"
-  },
-  {
-    starting_time: new Date("2015-07-08 15:00:00").getTime(),
-    ending_time: new Date("2015-07-08 16:30:00").getTime(),
-    therapist: "Person BB",
-    hotel: "Testing Hotel"
-  },
-  {
-    starting_time: new Date("2015-07-08 15:00:00").getTime(),
-    ending_time: new Date("2015-07-08 16:30:00").getTime(),
-    therapist: "Person C",
-    hotel: "Testing Hotel"
-  },
-  {
-    starting_time: new Date("2015-07-08 15:00:00").getTime(),
-    ending_time: new Date("2015-07-08 16:30:00").getTime(),
-    therapist: "Person CC",
-    hotel: "Testing Hotel"
-  },
-  {
-    starting_time: new Date("2015-07-08 15:00:00").getTime(),
-    ending_time: new Date("2015-07-08 16:30:00").getTime(),
-    therapist: "Person D",
-    hotel: "Testing Hotel"
-  },
-  {
-    starting_time: new Date("2015-07-08 15:00:00").getTime(),
-    ending_time: new Date("2015-07-08 16:30:00").getTime(),
-    therapist: "Person DD",
-    hotel: "Testing Hotel"
-  },
-  {
-    starting_time: new Date("2015-07-08 15:00:00").getTime(),
-    ending_time: new Date("2015-07-08 16:30:00").getTime(),
-    therapist: "Person E",
-    hotel: "Testing Hotel"
-  },
-  {
-    starting_time: new Date("2015-07-08 15:00:00").getTime(),
-    ending_time: new Date("2015-07-08 16:30:00").getTime(),
-    therapist: "Person EE",
-    hotel: "Testing Hotel"
-  },
-  {
-    starting_time: new Date("2015-07-08 15:00:00").getTime(),
-    ending_time: new Date("2015-07-08 16:30:00").getTime(),
-    therapist: "Person F",
-    hotel: "Testing Hotel"
-  },
-  {
-    starting_time: new Date("2015-07-08 15:00:00").getTime(),
-    ending_time: new Date("2015-07-08 16:30:00").getTime(),
-    therapist: "Person FF",
-    hotel: "Testing Hotel"
-  },
-  {
-    starting_time: new Date("2015-07-08 15:00:00").getTime(),
-    ending_time: new Date("2015-07-08 16:30:00").getTime(),
-    therapist: "Person G",
-    hotel: "Testing Hotel"
-  },
-  {
-    starting_time: new Date("2015-07-08 15:00:00").getTime(),
-    ending_time: new Date("2015-07-08 16:30:00").getTime(),
-    therapist: "Person GG",
-    hotel: "Testing Hotel"
-  },
-  {
-    starting_time: new Date("2015-07-08 15:00:00").getTime(),
-    ending_time: new Date("2015-07-08 16:30:00").getTime(),
-    therapist: "Person H",
-    hotel: "Testing Hotel"
-  },
-  {
-    starting_time: new Date("2015-07-08 15:00:00").getTime(),
-    ending_time: new Date("2015-07-08 16:30:00").getTime(),
-    therapist: "Person HH",
-    hotel: "Testing Hotel"
-  },
-  {
-    starting_time: new Date("2015-07-08 15:00:00").getTime(),
-    ending_time: new Date("2015-07-08 16:30:00").getTime(),
-    therapist: "Person I",
-    hotel: "Testing Hotel"
-  },
-  {
-    starting_time: new Date("2015-07-08 15:00:00").getTime(),
-    ending_time: new Date("2015-07-08 16:30:00").getTime(),
-    therapist: "Person II",
-    hotel: "Testing Hotel"
-  }
-];
-
 
 // Render
-var scheduler = new TimelineScheduler("#scheduler", dimension, TimelineScheduler.processData(testData, "therapist"), chart, grouping);
+var scheduler = new TimelineScheduler("#scheduler", dimension, data, chart, grouping);
 scheduler.render();
