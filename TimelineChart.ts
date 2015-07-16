@@ -125,7 +125,9 @@ class TimelineChart implements TimelineChartInterface {
     this.chartSvg = chartSvg;
   }
 
-  public onMouseOver(data: any, i: number): void {}
+  public onMouseOver(svg: any, data: any, i: number): void {}
+  public onMouseOut(svg: any, data: any, i: number): void {}
+  public titleOnHover(svg: any): void {}
 
   public drawData(): void {
     var baseG = this.chartSvg.append("g").attr("transform", "translate(0, 0)");
@@ -142,37 +144,57 @@ class TimelineChart implements TimelineChartInterface {
       .attr("transform", (d) => {
         return "translate(" + Math.floor(Math.random() * 2000) +  ", 0)";
       })
+      .attr("class", "block")
+      .on("mouseover", function (d: any, i: number) {
+        _this.onMouseOver(this, d, i);
+      })
+      .on("mouseout", function (d: any, i: number) {
+        _this.onMouseOut(this, d, i);
+      })
     ;
+    var _this = this;
 
     blockG.append("rect")
       .attr("fill", (d) => {
         return d.type.backgroundColor;
       })
       .attr("height", (d) => {
-        return d.type.height
+        return d.type.height;
       })
       .attr("width", (d) => {
-        // TODO: use time to calcualte, hardcoded for now
+        // TODO: use time to calculate, hardcoded for now
         return 100;
       })
+      .attr("stroke-width", (d) => {
+        return d.type.hasOwnProperty("strokeWidth") ? d.type.strokeWidth : 0;
+      })
       .attr("stroke", (d) => {
-        return d.type.hasOwnProperty("border") ? d.type.border : 0;
+        return d.type.hasOwnProperty("stroke") ? d.type.stroke : 0;
       })
       .attr("rx", (d) => {
         return d.type.hasOwnProperty("round") ? d.type.round : 0;
       })
       .attr("fill-opacity", (d) => {
-        return d.type.opacity
+        return d.type.opacity;
+      })
+      .attr("stroke-opacity", (d) => {
+        return d.type.opacity;
       })
       .attr("y", (d) => {
         if (d.type.height < rowHeight) {
           return (rowHeight - d.type.height) / 2;
         }
       })
-      .on("mouseover", (d: any, i: number) => {
-        this.onMouseOver(d, i);
-      })
     ;
+
+    var titleDesc = blockG.filter((d) => {
+      if (d.type.hasOwnProperty("hasLabel") && d.type.hasLabel === true) {
+        return true;
+      }
+      return false;
+    }).append("svg:title");
+
+    this.titleOnHover(titleDesc);
 
     blockG.filter((d) => {
       if (d.type.hasOwnProperty("hasLabel") && d.type.hasLabel === true) {

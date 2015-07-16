@@ -72,10 +72,13 @@ var TimelineChart = (function () {
         this.chartModuleDom = chartModuleDom;
         this.chartSvg = chartSvg;
     };
-    TimelineChart.prototype.onMouseOver = function (data, i) {
+    TimelineChart.prototype.onMouseOver = function (svg, data, i) {
+    };
+    TimelineChart.prototype.onMouseOut = function (svg, data, i) {
+    };
+    TimelineChart.prototype.titleOnHover = function (svg) {
     };
     TimelineChart.prototype.drawData = function () {
-        var _this = this;
         var baseG = this.chartSvg.append("g").attr("transform", "translate(0, 0)");
         var g = baseG.selectAll("g").data(d3.values(this.aData));
         var rowHeight = this.rowHeight;
@@ -86,27 +89,41 @@ var TimelineChart = (function () {
             return d;
         }).enter().append("g").attr("transform", function (d) {
             return "translate(" + Math.floor(Math.random() * 2000) + ", 0)";
+        }).attr("class", "block").on("mouseover", function (d, i) {
+            _this.onMouseOver(this, d, i);
+        }).on("mouseout", function (d, i) {
+            _this.onMouseOut(this, d, i);
         });
+        var _this = this;
         blockG.append("rect").attr("fill", function (d) {
             return d.type.backgroundColor;
         }).attr("height", function (d) {
             return d.type.height;
         }).attr("width", function (d) {
-            // TODO: use time to calcualte, hardcoded for now
+            // TODO: use time to calculate, hardcoded for now
             return 100;
+        }).attr("stroke-width", function (d) {
+            return d.type.hasOwnProperty("strokeWidth") ? d.type.strokeWidth : 0;
         }).attr("stroke", function (d) {
-            return d.type.hasOwnProperty("border") ? d.type.border : 0;
+            return d.type.hasOwnProperty("stroke") ? d.type.stroke : 0;
         }).attr("rx", function (d) {
             return d.type.hasOwnProperty("round") ? d.type.round : 0;
         }).attr("fill-opacity", function (d) {
+            return d.type.opacity;
+        }).attr("stroke-opacity", function (d) {
             return d.type.opacity;
         }).attr("y", function (d) {
             if (d.type.height < rowHeight) {
                 return (rowHeight - d.type.height) / 2;
             }
-        }).on("mouseover", function (d, i) {
-            _this.onMouseOver(d, i);
         });
+        var titleDesc = blockG.filter(function (d) {
+            if (d.type.hasOwnProperty("hasLabel") && d.type.hasLabel === true) {
+                return true;
+            }
+            return false;
+        }).append("svg:title");
+        this.titleOnHover(titleDesc);
         blockG.filter(function (d) {
             if (d.type.hasOwnProperty("hasLabel") && d.type.hasLabel === true) {
                 return true;

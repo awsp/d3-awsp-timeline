@@ -17,10 +17,10 @@ var types = [
     name: "Working Schedule",
     backgroundColor: "#4D82CC",
     foregroundColor: "#fff",
-    opacity: 0.85,
+    opacity: 0.90,
     height: 24,
-    border: 1,
-    borderColor: "#3D72BC",
+    stroke: "#4D82CC",
+    strokeWidth: 3,
     round: 3,
     hasLabel: true,
     fontSize: 11
@@ -72,9 +72,38 @@ var data = TimelineScheduler.processData(testData, "worker");
 // TimelineChart
 var chart = new TimelineChart(new TwoDimensionalShape(600, 400));
 chart.setRowHeight(rowHeight);
-chart.onMouseOver = function (data, i) {
-  console.log("F", i, data);
-}
+chart.onMouseOver = function (self, data, i) {
+  if (data.type.id === "work") {
+    d3.select(self).select("rect")
+      .transition()
+      .duration(300)
+      .attr({
+        "fill": "#5390E0",
+        "stroke": "#5390E0"
+      })
+    ;
+  }
+};
+chart.onMouseOut = function (self, data, i) {
+  if (data.type.id === "work") {
+    d3.select(self).select("rect")
+      .transition()
+      .duration(150)
+      .attr({
+        "fill": "#4D82CC",
+        "stroke": "#4D82CC"
+      })
+    ;
+  }
+};
+chart.titleOnHover = function (self) {
+  var label = self.attr("class", "block-label");
+  label.append("tspan")
+    .text(function (d) {
+      return d.place;
+    })
+  ;
+};
 
 
 // Timeline Group

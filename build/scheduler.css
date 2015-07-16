@@ -36,6 +36,13 @@
 .no-overflow {
   overflow: hidden;
 }
+.noselect {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
 html,
 body {
   padding: 0;
@@ -91,6 +98,14 @@ body {
   font-size: 11px;
   fill: #666;
   font-family: "Hiragino Kaku Gothic Pro", sans-serif;
+}
+.block {
+  cursor: default;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 .grid .tick {
   stroke: #eee;
