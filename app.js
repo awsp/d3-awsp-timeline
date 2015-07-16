@@ -6,18 +6,24 @@ var types = [
   {
     id: "availability",
     name: "Availabilities",
-    backgroundColor: "#eeffee",
+    backgroundColor: "#ccffcc",
     foregroundColor: "#447744",
-    opacity: 0.9,
-    height: rowHeight
+    opacity: 0.5,
+    height: rowHeight,
+    hasLabel: false
   },
   {
     id: "work",
     name: "Working Schedule",
-    backgroundColor: "#ffeeee",
-    foregroundColor: "#774444",
-    opacity: 0.7,
-    height: rowHeight - 4
+    backgroundColor: "#4D82CC",
+    foregroundColor: "#fff",
+    opacity: 0.85,
+    height: 24,
+    border: 1,
+    borderColor: "#3D72BC",
+    round: 3,
+    hasLabel: true,
+    fontSize: 11
   }
 ];
 
@@ -54,7 +60,7 @@ var generateRandomTimeData = function (date, n, workers) {
       ending_time: endingTime.getTime(),
       worker: workers[Math.floor(Math.random() * workers.length)].id,
       place: "Working Place " + (Math.random() * 10).toFixed(0),
-      type: types[Math.floor(Math.random() * workers.length)]
+      type: types[Math.floor(Math.random() * types.length)]
     });
   }
   return data;
@@ -62,9 +68,13 @@ var generateRandomTimeData = function (date, n, workers) {
 var testData = generateRandomTimeData("2015-07-15", 10, workers);
 var data = TimelineScheduler.processData(testData, "worker");
 
+
 // TimelineChart
 var chart = new TimelineChart(new TwoDimensionalShape(600, 400));
 chart.setRowHeight(rowHeight);
+chart.onMouseOver = function (data, i) {
+  console.log("F", i, data);
+}
 
 
 // Timeline Group

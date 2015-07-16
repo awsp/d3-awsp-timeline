@@ -1,4 +1,5 @@
 ///<reference path="DefinitelyTyped/d3/d3.d.ts" />
+///<reference path="DefinitelyTyped/underscore/underscore.d.ts" />
 ///<reference path="Dimension.ts" />
 ///<reference path="TimelineGroup.ts" />
 
@@ -124,6 +125,8 @@ class TimelineChart implements TimelineChartInterface {
     this.chartSvg = chartSvg;
   }
 
+  public onMouseOver(data: any, i: number): void {}
+
   public drawData(): void {
     var baseG = this.chartSvg.append("g").attr("transform", "translate(0, 0)");
     var g = baseG.selectAll("g").data(d3.values(this.aData));
@@ -132,8 +135,67 @@ class TimelineChart implements TimelineChartInterface {
       return "translate(0, " + rowHeight * i + ")";
     });
 
-    gEnter.append("rect").attr("width", 200).attr("height", rowHeight).attr("x", (d, i) => {
-      return +Math.random().toFixed(2) * 100;
-    });
+    var blockG = gEnter.selectAll("g").data((d: any, i: number) => {
+      return d;
+    }).enter()
+      .append("g")
+      .attr("transform", (d) => {
+        return "translate(" + Math.floor(Math.random() * 2000) +  ", 0)";
+      })
+    ;
+
+    blockG.append("rect")
+      .attr("fill", (d) => {
+        return d.type.backgroundColor;
+      })
+      .attr("height", (d) => {
+        return d.type.height
+      })
+      .attr("width", (d) => {
+        // TODO: use time to calcualte, hardcoded for now
+        return 100;
+      })
+      .attr("stroke", (d) => {
+        return d.type.hasOwnProperty("border") ? d.type.border : 0;
+      })
+      .attr("rx", (d) => {
+        return d.type.hasOwnProperty("round") ? d.type.round : 0;
+      })
+      .attr("fill-opacity", (d) => {
+        return d.type.opacity
+      })
+      .attr("y", (d) => {
+        if (d.type.height < rowHeight) {
+          return (rowHeight - d.type.height) / 2;
+        }
+      })
+      .on("mouseover", (d: any, i: number) => {
+        this.onMouseOver(d, i);
+      })
+    ;
+
+    blockG.filter((d) => {
+      if (d.type.hasOwnProperty("hasLabel") && d.type.hasLabel === true) {
+        return true;
+      }
+      return false;
+    }).append("text")
+      .text((d) => {
+        if (d.type.hasLabel) {
+          return d.place;
+        }
+        return "";
+      })
+      .attr("dx", (d) => {
+        return d.type.hasOwnProperty("round") ? d.type.round + 3 : 3;
+      })
+      .attr("dy", (d) => {
+        return rowHeight / 2;
+      })
+      .attr("style", (d) => {
+        return "fill: " + d.type.foregroundColor + "; font-size: " + (d.type.hasOwnProperty("fontSize") ? d.type.fontSize : 12) + "px";
+      })
+      .attr("dominant-baseline", "central")
+    ;
   }
 }

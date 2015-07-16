@@ -1,4 +1,5 @@
 ///<reference path="DefinitelyTyped/d3/d3.d.ts" />
+///<reference path="DefinitelyTyped/underscore/underscore.d.ts" />
 ///<reference path="Dimension.ts" />
 ///<reference path="TimelineGroup.ts" />
 /**
@@ -71,16 +72,58 @@ var TimelineChart = (function () {
         this.chartModuleDom = chartModuleDom;
         this.chartSvg = chartSvg;
     };
+    TimelineChart.prototype.onMouseOver = function (data, i) {
+    };
     TimelineChart.prototype.drawData = function () {
+        var _this = this;
         var baseG = this.chartSvg.append("g").attr("transform", "translate(0, 0)");
         var g = baseG.selectAll("g").data(d3.values(this.aData));
         var rowHeight = this.rowHeight;
         var gEnter = g.enter().append("g").attr("class", "chart-row").attr("transform", function (d, i) {
             return "translate(0, " + rowHeight * i + ")";
         });
-        gEnter.append("rect").attr("width", 200).attr("height", rowHeight).attr("x", function (d, i) {
-            return +Math.random().toFixed(2) * 100;
+        var blockG = gEnter.selectAll("g").data(function (d, i) {
+            return d;
+        }).enter().append("g").attr("transform", function (d) {
+            return "translate(" + Math.floor(Math.random() * 2000) + ", 0)";
         });
+        blockG.append("rect").attr("fill", function (d) {
+            return d.type.backgroundColor;
+        }).attr("height", function (d) {
+            return d.type.height;
+        }).attr("width", function (d) {
+            // TODO: use time to calcualte, hardcoded for now
+            return 100;
+        }).attr("stroke", function (d) {
+            return d.type.hasOwnProperty("border") ? d.type.border : 0;
+        }).attr("rx", function (d) {
+            return d.type.hasOwnProperty("round") ? d.type.round : 0;
+        }).attr("fill-opacity", function (d) {
+            return d.type.opacity;
+        }).attr("y", function (d) {
+            if (d.type.height < rowHeight) {
+                return (rowHeight - d.type.height) / 2;
+            }
+        }).on("mouseover", function (d, i) {
+            _this.onMouseOver(d, i);
+        });
+        blockG.filter(function (d) {
+            if (d.type.hasOwnProperty("hasLabel") && d.type.hasLabel === true) {
+                return true;
+            }
+            return false;
+        }).append("text").text(function (d) {
+            if (d.type.hasLabel) {
+                return d.place;
+            }
+            return "";
+        }).attr("dx", function (d) {
+            return d.type.hasOwnProperty("round") ? d.type.round + 3 : 3;
+        }).attr("dy", function (d) {
+            return rowHeight / 2;
+        }).attr("style", function (d) {
+            return "fill: " + d.type.foregroundColor + "; font-size: " + (d.type.hasOwnProperty("fontSize") ? d.type.fontSize : 12) + "px";
+        }).attr("dominant-baseline", "central");
     };
     // Timeline CSS Class Name, used to do some jQuery stuff.
     TimelineChart.scrollableTimelineClass = "timeline-asdf";
