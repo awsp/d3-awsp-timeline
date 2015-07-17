@@ -1,6 +1,7 @@
 lib/
 .idea/
 bower_components/
+node_modules/
 *.js.map
 .DS_Store
 .tmp/

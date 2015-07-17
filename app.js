@@ -1,29 +1,31 @@
 // Configuration
-var rowHeight = 40;
+var rowHeight = 42;
 
-// Types of Bar, order matters. [2] is on top of [1] and is on top of [0].
+// Types of Bar
 var types = [
   {
     id: "availability",
     name: "Availabilities",
     backgroundColor: "#ccffcc",
     foregroundColor: "#447744",
-    opacity: 0.3,
+    opacity: 0.4,
     height: rowHeight,
-    hasLabel: false
+    hasLabel: false,
+    zIndex: 0
   },
   {
     id: "work",
     name: "Working Schedule",
     backgroundColor: "#4D82CC",
     foregroundColor: "#fff",
-    opacity: 0.85,
+    opacity: 0.72,
     height: 24,
     stroke: "#4D82CC",
     strokeWidth: 3,
     round: 3,
     hasLabel: true,
-    fontSize: 11
+    fontSize: 11,
+    zIndex: 1
   }
 ];
 
