@@ -105,6 +105,29 @@ var TimelineChart = (function () {
         var baseG = this.chartSvg.append("g").attr("transform", "translate(0, 0)");
         var g = baseG.selectAll("g").data(d3.values(this.aData));
         var rowHeight = this.rowHeight;
+        var defFilter = baseG.append("defs").append("filter").attr({
+            x: 0,
+            y: 0,
+            width: "200%",
+            height: "200%",
+            id: "f1"
+        });
+        defFilter.append("feOffset").attr({
+            result: "offOut",
+            "in": "SourceGraphic",
+            dx: 2,
+            dy: 5
+        });
+        defFilter.append("feGaussianBlur").attr({
+            result: "blurOut",
+            "in": "matrixOut",
+            stdDeviation: 10
+        });
+        defFilter.append("feBlend").attr({
+            "in": "SourceGraphic",
+            in2: "blurOut",
+            mode: "normal"
+        });
         var gEnter = g.enter().append("g").attr("class", "chart-row").attr("transform", function (d, i) {
             return "translate(0, " + rowHeight * i + ")";
         });
@@ -133,6 +156,9 @@ var TimelineChart = (function () {
             var style = "";
             style += "stroke-opacity: " + (d.type.opacity / 2) + ";";
             style += "fill-opacity: " + d.type.opacity + ";";
+            if (d.type.hasLabel) {
+                style += "filter: url(#f1);";
+            }
             return style;
         }).attr("y", function (d) {
             if (d.type.height < rowHeight) {
