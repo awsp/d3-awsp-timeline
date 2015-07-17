@@ -8,7 +8,7 @@ var types = [
     name: "Availabilities",
     backgroundColor: "#ccffcc",
     foregroundColor: "#447744",
-    opacity: 0.5,
+    opacity: 0.3,
     height: rowHeight,
     hasLabel: false
   },
@@ -17,7 +17,7 @@ var types = [
     name: "Working Schedule",
     backgroundColor: "#4D82CC",
     foregroundColor: "#fff",
-    opacity: 0.90,
+    opacity: 0.85,
     height: 24,
     stroke: "#4D82CC",
     strokeWidth: 3,
@@ -65,13 +65,14 @@ var generateRandomTimeData = function (date, n, workers) {
   }
   return data;
 };
-var testData = generateRandomTimeData("2015-07-15", 10, workers);
+var testData = generateRandomTimeData("2015-07-14", 10, workers);
 var data = TimelineScheduler.processData(testData, "worker");
 
 
 // TimelineChart
 var chart = new TimelineChart(new TwoDimensionalShape(600, 400));
 chart.setRowHeight(rowHeight);
+chart.setBusinessHours(new Date("2015-07-14 00:00:00"), new Date("2015-07-14 23:59:59"));
 chart.onMouseOver = function (self, data, i) {
   if (data.type.id === "work") {
     d3.select(self).select("rect")
@@ -103,6 +104,9 @@ chart.titleOnHover = function (self) {
       return d.place;
     })
   ;
+};
+chart.labeling = function (data, i) {
+  return data.place;
 };
 
 

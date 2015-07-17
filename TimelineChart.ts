@@ -7,6 +7,11 @@ interface TimelineChartInterface {
   init(moduleName: string, gParent: any, data: any, width: d3.Primitive): void;
   setRowHeight(height: number): void;
   drawData(): void;
+  labeling(d: any, i?: number): any;
+  setBusinessHours(start: Date, end: Date);
+  onMouseOver(svg: any, data: any, i: number): void;
+  onMouseOut(svg: any, data: any, i: number): void;
+  titleOnHover(svg: any): void;
 }
 
 
@@ -44,12 +49,27 @@ class TimelineChart implements TimelineChartInterface {
   // Timeline Div Height
   public static timelineHeight: number = 21;
 
+  // Scaling - x direction
+  protected xScale: any;
+
+  // Chart output range, default to 2400
+  protected chartRange: number = 2400;
+
+  // Business hours
+  protected chartStart: Date = null;
+  protected chartEnd: Date = null;
+
 
   public constructor(dimension: Dimension) {
     if (!dimension) {
       throw new Error("Dimension is not set. ");
     }
     this.aDimension = dimension;
+    var date: Date = new Date();
+    var today: string = date.getFullYear() + "-" + date.getMonth() + "-" + date.getDate();
+    var start: Date = new Date(today + " 00:00:00");
+    var end: Date = new Date(today + " 23:59:59");
+    this.setBusinessHours(start, end);
   }
 
   public dimension(): Dimension {
@@ -69,17 +89,24 @@ class TimelineChart implements TimelineChartInterface {
     return this.dimension().width();
   }
 
+  /**
+   * Set up chart, timeline
+   * @param moduleName
+   * @param gParent
+   * @param data
+   * @param marginLeft
+   */
   public init(moduleName: string, gParent: any, data: any, marginLeft: number): void {
     this.gParent = gParent;
     this.moduleName = moduleName;
     this.aData = data; 
-    var theoreticalWidth: number = 2400; // TODO: temp value for width: 2400
+    var theoreticalWidth: number = this.chartRange;
     var theoreticalHeight: number = this.aHeight = Object.keys(data).length * this.rowHeight;
 
     // `chart-module` DOM
     var chartModuleDom = this.gParent.append("div");
     chartModuleDom.attr("id", this.moduleName + "-chart").attr("class", "chart-module");
-    chartModuleDom.attr("style", "width: " + this.dimension().width() + "; height: " + this.dimension().height() + "; margin-left: " + marginLeft + "px;");
+    chartModuleDom.attr("style", "width: " + this.dimension().width() + "; height: " + this.dimension().height() + "; margin-left: " + (marginLeft + 1) + "px;");
 
     // `chart-inner` DOM
     var chartInnerDom = chartModuleDom.append("div");
@@ -94,8 +121,8 @@ class TimelineChart implements TimelineChartInterface {
     timelineSvg.attr("width", theoreticalWidth).attr("height", TimelineChart.timelineHeight);
 
     // Timeline SVG timeline
-    var start = new Date("2015-07-14 00:00:00").getTime();
-    var end = new Date("2015-07-14 23:59:59").getTime();
+    var start = this.chartStart.getTime();
+    var end = this.chartEnd.getTime();
     var xScale = d3.time.scale().domain([start, end]).range([0, theoreticalWidth]);
     var xAxis = d3.svg.axis()
       .scale(xScale)
@@ -104,6 +131,8 @@ class TimelineChart implements TimelineChartInterface {
       .tickSize(6)
       .tickFormat(d3.time.format("%I:%M"));
     timelineSvg.append("g").attr("class", "axis").attr("transform", "translate(0, " + (TimelineChart.timelineHeight - 1) + ")").call(xAxis);
+
+    this.xScale = xScale;
 
     // Timeline Scrollable Div
     var chartScrollableDom = chartInnerDom.append("div");
@@ -129,10 +158,14 @@ class TimelineChart implements TimelineChartInterface {
   public onMouseOut(svg: any, data: any, i: number): void {}
   public titleOnHover(svg: any): void {}
 
+  /**
+   * Draw actual data onto the chart!
+   */
   public drawData(): void {
+    var that = this;
     var baseG = this.chartSvg.append("g").attr("transform", "translate(0, 0)");
     var g = baseG.selectAll("g").data(d3.values(this.aData));
-    var rowHeight = this.rowHeight;
+    var rowHeight: number = this.rowHeight;
     var gEnter = g.enter().append("g").attr("class", "chart-row").attr("transform", (d, i) => {
       return "translate(0, " + rowHeight * i + ")";
     });
@@ -142,17 +175,16 @@ class TimelineChart implements TimelineChartInterface {
     }).enter()
       .append("g")
       .attr("transform", (d) => {
-        return "translate(" + Math.floor(Math.random() * 2000) +  ", 0)";
+        return "translate(" + this.xScale(d.starting_time) +  ", 0)";
       })
       .attr("class", "block")
       .on("mouseover", function (d: any, i: number) {
-        _this.onMouseOver(this, d, i);
+        that.onMouseOver(this, d, i);
       })
       .on("mouseout", function (d: any, i: number) {
-        _this.onMouseOut(this, d, i);
+        that.onMouseOut(this, d, i);
       })
     ;
-    var _this = this;
 
     blockG.append("rect")
       .attr("fill", (d) => {
@@ -162,8 +194,7 @@ class TimelineChart implements TimelineChartInterface {
         return d.type.height;
       })
       .attr("width", (d) => {
-        // TODO: use time to calculate, hardcoded for now
-        return 100;
+        return this.xScale(new Date(d.ending_time)) - this.xScale(new Date(d.starting_time));
       })
       .attr("stroke-width", (d) => {
         return d.type.hasOwnProperty("strokeWidth") ? d.type.strokeWidth : 0;
@@ -174,11 +205,11 @@ class TimelineChart implements TimelineChartInterface {
       .attr("rx", (d) => {
         return d.type.hasOwnProperty("round") ? d.type.round : 0;
       })
-      .attr("fill-opacity", (d) => {
-        return d.type.opacity;
-      })
-      .attr("stroke-opacity", (d) => {
-        return d.type.opacity;
+      .attr("style", (d) => {
+        var style: string = "";
+        style += "stroke-opacity: " + (d.type.opacity / 2) + ";";
+        style += "fill-opacity: " + d.type.opacity + ";";
+        return style;
       })
       .attr("y", (d) => {
         if (d.type.height < rowHeight) {
@@ -188,30 +219,19 @@ class TimelineChart implements TimelineChartInterface {
     ;
 
     var titleDesc = blockG.filter((d) => {
-      if (d.type.hasOwnProperty("hasLabel") && d.type.hasLabel === true) {
-        return true;
-      }
-      return false;
+      return !!(d.type.hasOwnProperty("hasLabel") && d.type.hasLabel === true);
     }).append("svg:title");
 
     this.titleOnHover(titleDesc);
 
     blockG.filter((d) => {
-      if (d.type.hasOwnProperty("hasLabel") && d.type.hasLabel === true) {
-        return true;
-      }
-      return false;
+      return !!(d.type.hasOwnProperty("hasLabel") && d.type.hasLabel === true);
     }).append("text")
-      .text((d) => {
-        if (d.type.hasLabel) {
-          return d.place;
-        }
-        return "";
-      })
+      .text(that.labeling)
       .attr("dx", (d) => {
         return d.type.hasOwnProperty("round") ? d.type.round + 3 : 3;
       })
-      .attr("dy", (d) => {
+      .attr("dy", () => {
         return rowHeight / 2;
       })
       .attr("style", (d) => {
@@ -219,5 +239,14 @@ class TimelineChart implements TimelineChartInterface {
       })
       .attr("dominant-baseline", "central")
     ;
+  }
+
+  public labeling(d: any, i?: number): any {
+    return d.place;
+  }
+
+  public setBusinessHours(start: Date, end: Date) {
+    this.chartStart = start;
+    this.chartEnd = end;
   }
 }

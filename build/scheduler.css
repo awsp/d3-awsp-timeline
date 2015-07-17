@@ -55,16 +55,17 @@ body {
 }
 .scheduler-module {
   overflow: hidden;
-  border: 1px solid #ddd;
+  border: 1px solid #cccccc;
 }
 .scheduler-module .scheduler-inner {
   width: 100%;
   height: 100%;
+  background: #cccccc;
 }
 .scheduler-module .list-module {
   float: left;
   overflow: hidden;
-  background: #ffeeee;
+  background: #fff;
 }
 .scheduler-module .chart-module .chart-inner {
   background: #fefefe;

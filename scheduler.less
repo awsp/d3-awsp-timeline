@@ -36,19 +36,22 @@ body {
   color: #444;
 }
 
+
+@borderColor: #ccc;
 .scheduler-module {
   .no-overflow;
-  border: 1px solid #ddd;
+  border: 1px solid @borderColor;
 
   .scheduler-inner {
     width: 100%;
     height: 100%;
+    background: @borderColor;
   }
 
   .list-module {
     .fl;
     .no-overflow;
-    background: #ffeeee;
+    background: #fff;
   }
 
   .chart-module {
