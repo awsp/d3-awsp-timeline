@@ -46,6 +46,61 @@ var workers = [
     id: "person-c",
     firstName: "C",
     lastName: "Person"
+  },
+  {
+    id: "person-d",
+    firstName: "D",
+    lastName: "Person"
+  },
+  {
+    id: "person-e",
+    firstName: "E",
+    lastName: "Person"
+  },
+  {
+    id: "person-f",
+    firstName: "F",
+    lastName: "Person"
+  },
+  {
+    id: "person-g",
+    firstName: "G",
+    lastName: "Person"
+  },
+  {
+    id: "person-h",
+    firstName: "H",
+    lastName: "Person"
+  },
+  {
+    id: "person-i",
+    firstName: "I",
+    lastName: "Person"
+  },
+  {
+    id: "person-j",
+    firstName: "I",
+    lastName: "Person"
+  },
+  {
+    id: "person-k",
+    firstName: "K",
+    lastName: "Person"
+  },
+  {
+    id: "person-l",
+    firstName: "L",
+    lastName: "Person"
+  },
+  {
+    id: "person-m",
+    firstName: "M",
+    lastName: "Person"
+  },
+  {
+    id: "person-n",
+    firstName: "N",
+    lastName: "Person"
   }
 ]
 var generateRandomTimeData = function (date, n, workers) {
@@ -67,7 +122,7 @@ var generateRandomTimeData = function (date, n, workers) {
   }
   return data;
 };
-var testData = generateRandomTimeData("2015-07-14", 10, workers);
+var testData = generateRandomTimeData("2015-07-14", 150, workers);
 var data = TimelineScheduler.processData(testData, "worker");
 
 
