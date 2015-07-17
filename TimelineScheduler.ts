@@ -77,10 +77,28 @@ class TimelineScheduler {
    * Convert data based on a groupBy key.
    * @param data
    * @param groupBy
+   * @param order
    * @returns {Dictionary<T[]>|Dictionary<TValue[]>|_.Dictionary<T[]>}
+   *
+   * TODO: sorting worker's name.
    */
-  public static processData(data: any, groupBy: string): any {
-    return _.groupBy(data, groupBy);
+  public static processData(data: any, groupBy: string, order: string = "asc"): any {
+    var groupedData: any = _.groupBy(data, groupBy), sortedPersons: any, persons: any;
+
+    for (var i in groupedData) {
+      persons = groupedData[i];
+      // Sort in ascending order.
+      // zIndex at 2 is on top of 1, on top of 0, etc.
+      sortedPersons = _.sortBy(persons, function (d: any) {
+        if (order === "asc") {
+          return d.type.zIndex;
+        }
+        return -d.type.zIndex;
+      });
+      groupedData[i] = sortedPersons;
+    }
+
+    return groupedData;
   }
 
   /**

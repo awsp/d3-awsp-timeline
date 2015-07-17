@@ -59,6 +59,8 @@ class TimelineChart implements TimelineChartInterface {
   protected chartStart: Date = null;
   protected chartEnd: Date = null;
 
+  // X Axis Format
+  public axisFormat: string = "%I:%M";
 
   public constructor(dimension: Dimension) {
     if (!dimension) {
@@ -121,15 +123,15 @@ class TimelineChart implements TimelineChartInterface {
     timelineSvg.attr("width", theoreticalWidth).attr("height", TimelineChart.timelineHeight);
 
     // Timeline SVG timeline
-    var start = this.chartStart.getTime();
-    var end = this.chartEnd.getTime();
+    var start: number = this.chartStart.getTime();
+    var end: number = this.chartEnd.getTime();
     var xScale = d3.time.scale().domain([start, end]).range([0, theoreticalWidth]);
     var xAxis = d3.svg.axis()
       .scale(xScale)
       .orient("top")
       .ticks(d3.time.minutes, 30)
       .tickSize(6)
-      .tickFormat(d3.time.format("%I:%M"));
+      .tickFormat(d3.time.format(this.axisFormat));
     timelineSvg.append("g").attr("class", "axis").attr("transform", "translate(0, " + (TimelineChart.timelineHeight - 1) + ")").call(xAxis);
 
     this.xScale = xScale;
@@ -145,7 +147,7 @@ class TimelineChart implements TimelineChartInterface {
     chartSvg.attr("width", theoreticalWidth).attr("height", theoreticalHeight);
 
     // Timeline Chart Grid
-    var ticks = 48;
+    var ticks: number = 24 * 2;
     var xGridScale = d3.scale.linear().domain([0, theoreticalWidth]).range([0, theoreticalWidth]);
     var xGrid = d3.svg.axis().scale(xGridScale).orient("bottom").ticks(ticks).tickFormat("").tickSize(-theoreticalWidth, 0);
     chartSvg.append("g").attr("class", "grid").attr("transform", "translate(0," + theoreticalWidth + ")").call(xGrid);
@@ -180,7 +182,7 @@ class TimelineChart implements TimelineChartInterface {
         result: "offOut",
         "in": "SourceGraphic",
         dx: 2,
-        dy: 5
+        dy: 7
       })
     ;
     defFilter.append("feGaussianBlur")

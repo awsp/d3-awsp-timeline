@@ -18,6 +18,8 @@ var TimelineChart = (function () {
         // Business hours
         this.chartStart = null;
         this.chartEnd = null;
+        // X Axis Format
+        this.axisFormat = "%I:%M";
         if (!dimension) {
             throw new Error("Dimension is not set. ");
         }
@@ -71,7 +73,7 @@ var TimelineChart = (function () {
         var start = this.chartStart.getTime();
         var end = this.chartEnd.getTime();
         var xScale = d3.time.scale().domain([start, end]).range([0, theoreticalWidth]);
-        var xAxis = d3.svg.axis().scale(xScale).orient("top").ticks(d3.time.minutes, 30).tickSize(6).tickFormat(d3.time.format("%I:%M"));
+        var xAxis = d3.svg.axis().scale(xScale).orient("top").ticks(d3.time.minutes, 30).tickSize(6).tickFormat(d3.time.format(this.axisFormat));
         timelineSvg.append("g").attr("class", "axis").attr("transform", "translate(0, " + (TimelineChart.timelineHeight - 1) + ")").call(xAxis);
         this.xScale = xScale;
         // Timeline Scrollable Div
@@ -83,7 +85,7 @@ var TimelineChart = (function () {
         var chartSvg = chartScrollableDom.append("svg");
         chartSvg.attr("width", theoreticalWidth).attr("height", theoreticalHeight);
         // Timeline Chart Grid
-        var ticks = 48;
+        var ticks = 24 * 2;
         var xGridScale = d3.scale.linear().domain([0, theoreticalWidth]).range([0, theoreticalWidth]);
         var xGrid = d3.svg.axis().scale(xGridScale).orient("bottom").ticks(ticks).tickFormat("").tickSize(-theoreticalWidth, 0);
         chartSvg.append("g").attr("class", "grid").attr("transform", "translate(0," + theoreticalWidth + ")").call(xGrid);
@@ -116,7 +118,7 @@ var TimelineChart = (function () {
             result: "offOut",
             "in": "SourceGraphic",
             dx: 2,
-            dy: 5
+            dy: 7
         });
         defFilter.append("feGaussianBlur").attr({
             result: "blurOut",

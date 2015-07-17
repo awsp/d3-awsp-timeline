@@ -53,10 +53,27 @@ var TimelineScheduler = (function () {
      * Convert data based on a groupBy key.
      * @param data
      * @param groupBy
+     * @param order
      * @returns {Dictionary<T[]>|Dictionary<TValue[]>|_.Dictionary<T[]>}
+     *
+     * TODO: sorting worker's name.
      */
-    TimelineScheduler.processData = function (data, groupBy) {
-        return _.groupBy(data, groupBy);
+    TimelineScheduler.processData = function (data, groupBy, order) {
+        if (order === void 0) { order = "asc"; }
+        var groupedData = _.groupBy(data, groupBy), sortedPersons, persons;
+        for (var i in groupedData) {
+            persons = groupedData[i];
+            // Sort in ascending order.
+            // zIndex at 2 is on top of 1, on top of 0, etc.
+            sortedPersons = _.sortBy(persons, function (d) {
+                if (order === "asc") {
+                    return d.type.zIndex;
+                }
+                return -d.type.zIndex;
+            });
+            groupedData[i] = sortedPersons;
+        }
+        return groupedData;
     };
     /**
      * Initialize G parent.
