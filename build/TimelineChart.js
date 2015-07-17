@@ -59,7 +59,7 @@ var TimelineChart = (function () {
         // `chart-module` DOM
         var chartModuleDom = this.gParent.append("div");
         chartModuleDom.attr("id", this.moduleName + "-chart").attr("class", "chart-module");
-        chartModuleDom.attr("style", "width: " + this.dimension().width() + "; height: " + this.dimension().height() + "; margin-left: " + (marginLeft + 1) + "px;");
+        chartModuleDom.attr("style", "height: " + this.dimension().height() + "px; margin-left: " + (marginLeft + 1) + "px;");
         // `chart-inner` DOM
         var chartInnerDom = chartModuleDom.append("div");
         chartInnerDom.attr("class", "chart-inner");
@@ -80,7 +80,7 @@ var TimelineChart = (function () {
         var chartScrollableDom = chartInnerDom.append("div");
         var remainingWidth = this.dimension().height() - TimelineChart.timelineHeight;
         chartScrollableDom.attr("class", TimelineChart.scrollableTimelineClass);
-        chartScrollableDom.attr("style", "width: " + this.dimension().width() + "; height: " + remainingWidth + "px");
+        chartScrollableDom.attr("style", "height: " + remainingWidth + "px");
         // Timeline Chart SVG
         var chartSvg = chartScrollableDom.append("svg");
         chartSvg.attr("width", theoreticalWidth).attr("height", theoreticalHeight);
@@ -189,7 +189,7 @@ var TimelineChart = (function () {
         this.chartEnd = end;
     };
     // Timeline CSS Class Name, used to do some jQuery stuff.
-    TimelineChart.scrollableTimelineClass = "timeline-asdf";
+    TimelineChart.scrollableTimelineClass = "timeline-scrollable";
     // Timeline Div Height
     TimelineChart.timelineHeight = 21;
     return TimelineChart;

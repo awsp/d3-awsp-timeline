@@ -10,12 +10,15 @@ var TwoDimensionalShape = (function () {
      * @returns {d3.Primitive}
      */
     TwoDimensionalShape.prototype.width = function (w) {
+        // TODO: this part is not called.
         if (w) {
             if (+w > 0) {
                 this.aWidth = w;
             }
+            else if (w.toString().match(/\%/).length >= 0) {
+            }
             else {
-                throw new Error("Width msut be a number and greater than 0. ");
+                throw new Error("Width must be a number and greater than 0. ");
             }
         }
         return this.aWidth;

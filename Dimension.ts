@@ -20,12 +20,16 @@ class TwoDimensionalShape implements Dimension {
    * @returns {d3.Primitive}
    */
   public width(w?: d3.Primitive): d3.Primitive {
+    // TODO: this part is not called.
     if (w) {
       if (+w > 0) {
         this.aWidth = w;
       }
+      else if (w.toString().match(/\%/).length >= 0) {
+
+      }
       else {
-        throw new Error("Width msut be a number and greater than 0. ");
+        throw new Error("Width must be a number and greater than 0. ");
       }
     }
     return this.aWidth;

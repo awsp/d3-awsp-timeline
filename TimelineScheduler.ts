@@ -107,7 +107,9 @@ class TimelineScheduler {
    */
   public initGParent(target: string): void {
     this.aTarget = d3.select(target);
-    this.aTarget.attr("class", TimelineScheduler.scheduleModuleClass).attr("style", "width: " + this.dimension().width() + "px; height: " + this.dimension().height() + "px;");
+    this.aTarget.attr("class", TimelineScheduler.scheduleModuleClass)
+      .attr("style", "width: " + this.dimension().width() + (+this.dimension().width() >= 0 ? "px" : "") + "; " +
+      "height: " + this.dimension().height() + (+this.dimension().height() >= 0 ? "px" : "")  + ";");
     var aTargetInner: any = this.aTarget.append("div");
     aTargetInner.attr("class", TimelineScheduler.scheduleInnerClass);
 

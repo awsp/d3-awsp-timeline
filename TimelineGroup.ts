@@ -59,7 +59,7 @@ class TimelineGroup implements TimelineGroupInterface {
     // Create a HTML element with attributes like width and height
     var domInstance = this.gParent.append("div");
     domInstance.attr("id", this.moduleName + "-grouping").attr("class", "list-module");
-    domInstance.attr("style", "width: " + this.dimension().width() + "px; " +
+    domInstance.attr("style", "width: " + this.dimension().width() + (+this.dimension().width() >= 0 ? "px" : "") + "; " +
       "height: " + (<number>this.dimension().height() - TimelineChart.timelineHeight) + "px; " +
       "margin-top: " + TimelineChart.timelineHeight + "px;");
 

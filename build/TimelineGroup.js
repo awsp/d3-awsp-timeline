@@ -36,7 +36,7 @@ var TimelineGroup = (function () {
         // Create a HTML element with attributes like width and height
         var domInstance = this.gParent.append("div");
         domInstance.attr("id", this.moduleName + "-grouping").attr("class", "list-module");
-        domInstance.attr("style", "width: " + this.dimension().width() + "px; " + "height: " + (this.dimension().height() - TimelineChart.timelineHeight) + "px; " + "margin-top: " + TimelineChart.timelineHeight + "px;");
+        domInstance.attr("style", "width: " + this.dimension().width() + (+this.dimension().width() >= 0 ? "px" : "") + "; " + "height: " + (this.dimension().height() - TimelineChart.timelineHeight) + "px; " + "margin-top: " + TimelineChart.timelineHeight + "px;");
         // Create SVG element inside this DOM.
         // TODO: height is using pre-defined number.
         var svgInstance = domInstance.append("svg");

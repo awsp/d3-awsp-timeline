@@ -30,7 +30,7 @@ var types = [
 ];
 
 // Scheduler
-var dimension = new TwoDimensionalShape(700, 400);
+var dimension = new TwoDimensionalShape("100%", 400);
 var workers = [
   {
     id: "person-a",
@@ -72,7 +72,7 @@ var data = TimelineScheduler.processData(testData, "worker");
 
 
 // TimelineChart
-var chart = new TimelineChart(new TwoDimensionalShape(600, 400));
+var chart = new TimelineChart(new TwoDimensionalShape(800, 400));
 chart.setRowHeight(rowHeight);
 chart.setBusinessHours(new Date("2015-07-14 00:00:00"), new Date("2015-07-14 23:59:59"));
 chart.onMouseOver = function (self, data, i) {

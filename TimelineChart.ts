@@ -44,7 +44,7 @@ class TimelineChart implements TimelineChartInterface {
   protected aData: any;
 
   // Timeline CSS Class Name, used to do some jQuery stuff.
-  public static scrollableTimelineClass: string = "timeline-asdf";
+  public static scrollableTimelineClass: string = "timeline-scrollable";
 
   // Timeline Div Height
   public static timelineHeight: number = 21;
@@ -108,7 +108,7 @@ class TimelineChart implements TimelineChartInterface {
     // `chart-module` DOM
     var chartModuleDom = this.gParent.append("div");
     chartModuleDom.attr("id", this.moduleName + "-chart").attr("class", "chart-module");
-    chartModuleDom.attr("style", "width: " + this.dimension().width() + "; height: " + this.dimension().height() + "; margin-left: " + (marginLeft + 1) + "px;");
+    chartModuleDom.attr("style", "height: " + this.dimension().height() + "px; margin-left: " + (marginLeft + 1) + "px;");
 
     // `chart-inner` DOM
     var chartInnerDom = chartModuleDom.append("div");
@@ -140,7 +140,7 @@ class TimelineChart implements TimelineChartInterface {
     var chartScrollableDom = chartInnerDom.append("div");
     var remainingWidth: number = <number>this.dimension().height() - TimelineChart.timelineHeight;
     chartScrollableDom.attr("class", TimelineChart.scrollableTimelineClass);
-    chartScrollableDom.attr("style", "width: " + this.dimension().width() + "; height: " + remainingWidth + "px");
+    chartScrollableDom.attr("style", "height: " + remainingWidth + "px");
 
     // Timeline Chart SVG
     var chartSvg = chartScrollableDom.append("svg");
