@@ -18,3 +18,11 @@ Compile *.ts files to individual *.js files
 ```
 gulp compile
 ```
+
+
+## ToDo
+```
+- Implement brush to zoom in / out
+- Add more events handler such as (double click, click, etc.)
+- APIs for Updating chart, deleting chart, etc.
+```

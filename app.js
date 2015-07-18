@@ -112,7 +112,7 @@ var workers = [
     firstName: "N",
     lastName: "Person"
   }
-]
+];
 var generateRandomTimeData = function (date, n, workers) {
   var data = [];
   var maximum = 4, minimum = 1;
