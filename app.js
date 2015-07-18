@@ -14,6 +14,16 @@ var types = [
     zIndex: 0
   },
   {
+    id: "busy",
+    name: "Busy",
+    backgroundColor: "#ffcccc",
+    foregroundColor: "#774444",
+    opacity: 0.4,
+    height: rowHeight,
+    hasLabel: false,
+    zIndex: 1
+  },
+  {
     id: "work",
     name: "Working Schedule",
     backgroundColor: "#4D82CC",
@@ -25,7 +35,7 @@ var types = [
     round: 3,
     hasLabel: true,
     fontSize: 11,
-    zIndex: 1
+    zIndex: 2
   }
 ];
 
@@ -105,12 +115,15 @@ var workers = [
 ]
 var generateRandomTimeData = function (date, n, workers) {
   var data = [];
+  var maximum = 4, minimum = 1;
+  var randomNumber, sTimeFactor, startingTime, eTimeFactor, endingTime;
 
   for (var i = 0; i < n; i++) {
-    var sTimeFactor = +((Math.random() * 18).toFixed(0)); // set latest possibility to 18
-    var startingTime = new Date(date + " " + sTimeFactor + ":00:00");
-    var eTimeFactor = sTimeFactor + (+((Math.random() * 4).toFixed(0)));
-    var endingTime = new Date(date + " " + eTimeFactor + ":00:00");
+    randomNumber = Math.floor((Math.random() * (maximum - minimum + 1) ) << 0) + minimum;
+    sTimeFactor = +((Math.random() * 18).toFixed(0)); // set latest possibility to 18
+    startingTime = new Date(date + " " + sTimeFactor + ":00:00");
+    eTimeFactor = sTimeFactor + (+(randomNumber));
+    endingTime = new Date(date + " " + eTimeFactor + ":00:00");
 
     data.push({
       starting_time: startingTime.getTime(),
