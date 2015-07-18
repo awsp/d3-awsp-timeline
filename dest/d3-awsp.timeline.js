@@ -10,12 +10,15 @@ var TwoDimensionalShape = (function () {
      * @returns {d3.Primitive}
      */
     TwoDimensionalShape.prototype.width = function (w) {
+        // TODO: this part is not called.
         if (w) {
             if (+w > 0) {
                 this.aWidth = w;
             }
+            else if (w.toString().match(/\%/).length >= 0) {
+            }
             else {
-                throw new Error("Width msut be a number and greater than 0. ");
+                throw new Error("Width must be a number and greater than 0. ");
             }
         }
         return this.aWidth;
@@ -76,7 +79,7 @@ var TimelineGroup = (function () {
         // Create a HTML element with attributes like width and height
         var domInstance = this.gParent.append("div");
         domInstance.attr("id", this.moduleName + "-grouping").attr("class", "list-module");
-        domInstance.attr("style", "width: " + this.dimension().width() + "px; " +
+        domInstance.attr("style", "width: " + this.dimension().width() + (+this.dimension().width() >= 0 ? "px" : "") + "; " +
             "height: " + (this.dimension().height() - TimelineChart.timelineHeight) + "px; " +
             "margin-top: " + TimelineChart.timelineHeight + "px;");
         // Create SVG element inside this DOM.
@@ -181,7 +184,7 @@ var TimelineChart = (function () {
         // `chart-module` DOM
         var chartModuleDom = this.gParent.append("div");
         chartModuleDom.attr("id", this.moduleName + "-chart").attr("class", "chart-module");
-        chartModuleDom.attr("style", "width: " + this.dimension().width() + "; height: " + this.dimension().height() + "; margin-left: " + (marginLeft + 1) + "px;");
+        chartModuleDom.attr("style", "height: " + this.dimension().height() + "px; margin-left: " + (marginLeft + 1) + "px;");
         // `chart-inner` DOM
         var chartInnerDom = chartModuleDom.append("div");
         chartInnerDom.attr("class", "chart-inner");
@@ -207,7 +210,7 @@ var TimelineChart = (function () {
         var chartScrollableDom = chartInnerDom.append("div");
         var remainingWidth = this.dimension().height() - TimelineChart.timelineHeight;
         chartScrollableDom.attr("class", TimelineChart.scrollableTimelineClass);
-        chartScrollableDom.attr("style", "width: " + this.dimension().width() + "; height: " + remainingWidth + "px");
+        chartScrollableDom.attr("style", "height: " + remainingWidth + "px");
         // Timeline Chart SVG
         var chartSvg = chartScrollableDom.append("svg");
         chartSvg.attr("width", theoreticalWidth).attr("height", theoreticalHeight);
@@ -335,7 +338,7 @@ var TimelineChart = (function () {
         this.chartEnd = end;
     };
     // Timeline CSS Class Name, used to do some jQuery stuff.
-    TimelineChart.scrollableTimelineClass = "timeline-asdf";
+    TimelineChart.scrollableTimelineClass = "timeline-scrollable";
     // Timeline Div Height
     TimelineChart.timelineHeight = 21;
     return TimelineChart;
@@ -423,7 +426,9 @@ var TimelineScheduler = (function () {
      */
     TimelineScheduler.prototype.initGParent = function (target) {
         this.aTarget = d3.select(target);
-        this.aTarget.attr("class", TimelineScheduler.scheduleModuleClass).attr("style", "width: " + this.dimension().width() + "px; height: " + this.dimension().height() + "px;");
+        this.aTarget.attr("class", TimelineScheduler.scheduleModuleClass)
+            .attr("style", "width: " + this.dimension().width() + (+this.dimension().width() >= 0 ? "px" : "") + "; " +
+            "height: " + this.dimension().height() + (+this.dimension().height() >= 0 ? "px" : "") + ";");
         var aTargetInner = this.aTarget.append("div");
         aTargetInner.attr("class", TimelineScheduler.scheduleInnerClass);
         // Draw them out!
