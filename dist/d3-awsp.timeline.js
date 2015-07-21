@@ -120,6 +120,9 @@ var TimelineGroup = (function () {
         })
             .attr("text-anchor", "start");
     };
+    TimelineGroup.prototype.clearNodes = function () {
+        this.svgInstance.selectAll("g").remove();
+    };
     TimelineGroup.leftPadding = 5;
     return TimelineGroup;
 })();
@@ -167,6 +170,9 @@ var TimelineChart = (function () {
     };
     TimelineChart.prototype.width = function () {
         return this.dimension().width();
+    };
+    TimelineChart.prototype.setData = function (data) {
+        this.aData = data;
     };
     /**
      * Set up chart, timeline
@@ -231,7 +237,7 @@ var TimelineChart = (function () {
     TimelineChart.prototype.drawData = function () {
         var _this = this;
         var that = this;
-        var baseG = this.chartSvg.append("g").attr("transform", "translate(0, 0)");
+        var baseG = this.chartSvg.append("g").attr("transform", "translate(0, 0)").attr("class", "node-chart");
         var g = baseG.selectAll("g").data(d3.values(this.aData));
         var rowHeight = this.rowHeight;
         var defFilter = baseG.append("defs").append("filter")
@@ -330,9 +336,28 @@ var TimelineChart = (function () {
         })
             .attr("dominant-baseline", "central");
     };
+    TimelineChart.prototype.clearAll = function () {
+        this.chartSvg.selectAll("*").remove();
+    };
+    TimelineChart.prototype.clearNodes = function () {
+        this.chartSvg.selectAll(".node-chart").remove();
+    };
     TimelineChart.prototype.labeling = function (d, i) {
         return d.place;
     };
+    /**
+     * Short form / Alias for setting daily business hours
+     * @param date
+     */
+    TimelineChart.prototype.setDate = function (date) {
+        var startTime = "00:00:00", endTime = "23:59:59";
+        this.setBusinessHours(new Date(date + " " + startTime), new Date(date + " " + endTime));
+    };
+    /**
+     * Set domain for business hours to display in chart
+     * @param start
+     * @param end
+     */
     TimelineChart.prototype.setBusinessHours = function (start, end) {
         this.chartStart = start;
         this.chartEnd = end;
@@ -365,12 +390,12 @@ var TimelineScheduler = (function () {
         // Chart & Groups
         this.chart = chart;
         this.grouping = grouping;
-        // Data
-        this.aData = data;
         // Timeline scheduler dimension settings
         this.aDimension = dimension;
         // Begin to initialize root frame
-        this.initGParent(target);
+        var innerRoot = this.aTargetInner = this.initGParent(target);
+        // Data
+        this.initData(data, innerRoot);
     }
     /**
      * Get stem of the target name, dispatch its front property such as . or #
@@ -431,14 +456,32 @@ var TimelineScheduler = (function () {
             "height: " + this.dimension().height() + (+this.dimension().height() >= 0 ? "px" : "") + ";");
         var aTargetInner = this.aTarget.append("div");
         aTargetInner.attr("class", TimelineScheduler.scheduleInnerClass);
-        // Draw them out!
-        this.grouping.init(this.targetStem, aTargetInner, this.aData);
-        this.chart.init(this.targetStem, aTargetInner, this.aData, this.grouping.dimension().width());
         // Scrolling
         $("." + TimelineChart.scrollableTimelineClass, this.targetName).on("scroll", function () {
             $("." + TimelineScheduler.listModuleClass, this.targetName).scrollTop($(this).scrollTop());
             $("." + TimelineScheduler.chartTimelineClass, this.targetName).scrollLeft($(this).scrollLeft());
         });
+        return aTargetInner;
+    };
+    TimelineScheduler.prototype.initData = function (data, aTargetInner) {
+        this.aData = data;
+        if (!aTargetInner) {
+            aTargetInner = this.aTargetInner;
+        }
+        // Draw them out!
+        this.grouping.init(this.targetStem, aTargetInner, this.aData);
+        this.chart.init(this.targetStem, aTargetInner, this.aData, this.grouping.dimension().width());
+    };
+    /**
+     * Shortcut to set data for both grouping and chart.
+     * @param data
+     */
+    TimelineScheduler.prototype.setData = function (data) {
+        this.chart.setData(data);
+    };
+    TimelineScheduler.prototype.clear = function () {
+        this.chart.clearNodes();
+        this.grouping.clearNodes();
     };
     /**
      * Main renderer

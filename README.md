@@ -4,7 +4,7 @@ Draw scheduler using d3.js library
 
 ## Folder Structure
 - ./build/**   - Used in development, automatically generated from Intellij
-- ./dest/**    - Production use, compiled and minified files
+- ./dist/**    - Production use, compiled and minified files
 - ./app.js     - Main file
 - ./index.html - Demo
 
