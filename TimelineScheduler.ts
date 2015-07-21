@@ -114,12 +114,6 @@ class TimelineScheduler {
     var aTargetInner: any = this.aTarget.append("div");
     aTargetInner.attr("class", TimelineScheduler.scheduleInnerClass);
 
-    // Scrolling
-    $("." + TimelineChart.scrollableTimelineClass, this.targetName).on("scroll", function () {
-      $("." + TimelineScheduler.listModuleClass, this.targetName).scrollTop($(this).scrollTop());
-      $("." + TimelineScheduler.chartTimelineClass, this.targetName).scrollLeft($(this).scrollLeft());
-    });
-
     return aTargetInner;
   }
 
@@ -132,6 +126,13 @@ class TimelineScheduler {
     // Draw them out!
     this.grouping.init(this.targetStem, aTargetInner, this.aData);
     this.chart.init(this.targetStem, aTargetInner, this.aData, this.grouping.dimension().width());
+
+    // Scrolling
+    $("." + TimelineChart.scrollableTimelineClass, this.targetName).on("scroll", function () {
+      console.log('here');
+      $("." + TimelineScheduler.listModuleClass, this.targetName).scrollTop($(this).scrollTop());
+      $("." + TimelineScheduler.chartTimelineClass, this.targetName).scrollLeft($(this).scrollLeft());
+    });
   }
 
   /**
