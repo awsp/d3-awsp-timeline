@@ -43,7 +43,7 @@ var types = [
 var dimension = new TwoDimensionalShape("100%", 400);
 var workers = [
   {
-    id: "person-a",
+    id: "ながいながいながい名",
     firstName: "A",
     lastName: "Person"
   },

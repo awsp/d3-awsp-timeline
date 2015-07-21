@@ -6,10 +6,16 @@
  */
 var TimelineGroup = (function () {
     function TimelineGroup(dimension) {
-        this.domInstance = null; // DOM root element
-        this.svgInstance = null; // SVG root element
+        // DOM root element
+        this.domInstance = null;
+        // SVG root element
+        this.svgInstance = null;
+        // Row's height, default to 21
         this.rowHeight = 21;
-        this.aHeight = 0; // Overall height
+        // Overall height
+        this.aHeight = 0;
+        // Text width, used to calcalate truncate position
+        this.textFactorBase = 9;
         if (!dimension) {
             throw new Error("Dimension is not set. ");
         }
@@ -28,6 +34,12 @@ var TimelineGroup = (function () {
     TimelineGroup.prototype.getRowHeight = function () {
         return this.rowHeight;
     };
+    /**
+     * Initialize the base dom and svg elements.
+     * @param moduleName
+     * @param gParent
+     * @param data
+     */
     TimelineGroup.prototype.init = function (moduleName, gParent, data) {
         this.gParent = gParent;
         this.moduleName = moduleName;
@@ -45,7 +57,12 @@ var TimelineGroup = (function () {
         this.domInstance = domInstance;
         this.svgInstance = svgInstance;
     };
+    /**
+     * Draw the data out based on given data.
+     * @param data
+     */
     TimelineGroup.prototype.drawData = function (data) {
+        var _this = this;
         // Allow data to override original value.
         if (!data) {
             data = this.aData;
@@ -61,6 +78,10 @@ var TimelineGroup = (function () {
             return i % 2 === 0 ? "even" : "odd";
         });
         gEnter.append("text").text(function (d) {
+            var factor = _this.getTextFactor(d[0].worker);
+            if (d[0].worker.length > factor) {
+                return d[0].worker.substring(0, factor) + "...";
+            }
             return d[0].worker;
         }).attr("dominant-baseline", "central").attr("x", function (d, i) {
             return 5;
@@ -68,12 +89,36 @@ var TimelineGroup = (function () {
             return rowHeight / 2;
         }).attr("text-anchor", "start");
     };
+    /**
+     * Get factor of a text string
+     * @param text
+     * @returns {number}
+     */
+    TimelineGroup.prototype.getTextFactor = function (text) {
+        var factor;
+        factor = this.dimension().width() / this.textFactorBase;
+        if (TimelineGroup.containsNonLatinCodepoints(text)) {
+            factor /= 2;
+        }
+        return factor;
+    };
     TimelineGroup.prototype.clearNodes = function () {
         this.svgInstance.selectAll("g").remove();
     };
     TimelineGroup.prototype.setData = function (data) {
         this.aData = data;
     };
+    /**
+     * Test if a string contains non-latin characters
+     * Reference:
+     *   http://stackoverflow.com/questions/147824/how-to-find-whether-a-particular-string-has-unicode-characters-esp-double-byte
+     * @param text
+     * @returns {boolean}
+     */
+    TimelineGroup.containsNonLatinCodepoints = function (text) {
+        return /[^\u0000-\u00ff]/.test(text);
+    };
+    // Left padding of text
     TimelineGroup.leftPadding = 5;
     return TimelineGroup;
 })();
