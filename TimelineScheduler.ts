@@ -145,6 +145,7 @@ class TimelineScheduler {
 
   public clear(): void {
     this.chart.clearNodes();
+    this.chart.clearTimeline();
     this.grouping.clearNodes();
   }
 

@@ -115,3 +115,7 @@ body {
 .grid path {
   stroke-width: 0;
 }
+.selected rect {
+  fill: #f00;
+  stroke: #f00;
+}
