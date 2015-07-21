@@ -71,6 +71,9 @@ var TimelineGroup = (function () {
     TimelineGroup.prototype.clearNodes = function () {
         this.svgInstance.selectAll("g").remove();
     };
+    TimelineGroup.prototype.setData = function (data) {
+        this.aData = data;
+    };
     TimelineGroup.leftPadding = 5;
     return TimelineGroup;
 })();

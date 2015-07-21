@@ -197,9 +197,29 @@ scheduler.render();
     });
 
     $("#change-data").on("click", function () {
-      var newTestData = TimelineScheduler.processData(generateRandomTimeData("2015-07-14", 150, workers), "worker");
+      var newTestData = TimelineScheduler.processData(generateRandomTimeData("2015-07-16", 150, workers), "worker");
+      scheduler.chart.setDate("2015-07-16");
       scheduler.setData(newTestData);
-      alert("data changed. ");
+      console.log("data and date changed. ");
+    });
+
+    $("#change-workers").on("click", function () {
+      var newWorkers = [
+        {
+          id: "person-d",
+          firstName: "DDD",
+          lastName: "NewPerson"
+        },
+        {
+          id: "person-b",
+          firstName: "BBB",
+          lastName: "NewPerson"
+        }
+      ];
+      var newTestData = TimelineScheduler.processData(generateRandomTimeData("2015-07-16", 30, newWorkers), "worker");
+      scheduler.chart.setDate("2015-07-16");
+      scheduler.setData(newTestData);
+      console.log("data and date changed. ");
     });
 
     $("#draw").on("click", function () {

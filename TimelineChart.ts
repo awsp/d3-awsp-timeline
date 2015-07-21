@@ -8,7 +8,7 @@ interface TimelineChartInterface {
   setRowHeight(height: number): void;
   drawData(): void;
   labeling(d: any, i?: number): any;
-  setDate(date: Date): void;
+  setDate(date: string): void;
   setBusinessHours(start: Date, end: Date): void;
   onMouseOver(svg: any, data: any, i: number): void;
   onMouseOut(svg: any, data: any, i: number): void;
@@ -63,7 +63,6 @@ class TimelineChart implements TimelineChartInterface {
   // Business hours
   protected chartStart: Date = null;
   protected chartEnd: Date = null;
-  protected xAxis: any;
 
   // X Axis Format
   public axisFormat: string = "%I:%M";
@@ -176,8 +175,8 @@ class TimelineChart implements TimelineChartInterface {
   public updateXAxis(): any {
     var start: number = this.chartStart.getTime();
     var end: number = this.chartEnd.getTime();
-    this.xAxis = d3.time.scale().domain([start, end]).range([0, this.chartRange]);
-    return this.xAxis;
+    this.xScale = d3.time.scale().domain([start, end]).range([0, this.chartRange]);
+    return this.xScale;
   }
 
   public onMouseOver(svg: any, data: any, i: number): void {}
@@ -316,15 +315,6 @@ class TimelineChart implements TimelineChartInterface {
   }
 
   /**
-   * Short form / Alias for setting daily business hours
-   * @param date
-   */
-  public setDate(date: Date): void {
-    var startTime: string = "00:00:00", endTime: string = "23:59:59";
-    this.setBusinessHours(new Date(date + " " + startTime), new Date(date + " " + endTime));
-  }
-
-  /**
    * Set domain for business hours to display in chart
    * @param start
    * @param end
@@ -335,5 +325,14 @@ class TimelineChart implements TimelineChartInterface {
 
     // Update x axis scaling
     this.updateXAxis();
+  }
+
+  /**
+   * Short form / Alias for setting daily business hours
+   * @param date
+   */
+  public setDate(date: string): void {
+    var startTime: string = "00:00:00", endTime: string = "23:59:59";
+    this.setBusinessHours(new Date(date + " " + startTime), new Date(date + " " + endTime));
   }
 }

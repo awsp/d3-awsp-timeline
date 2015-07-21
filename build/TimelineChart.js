@@ -105,8 +105,8 @@ var TimelineChart = (function () {
     TimelineChart.prototype.updateXAxis = function () {
         var start = this.chartStart.getTime();
         var end = this.chartEnd.getTime();
-        this.xAxis = d3.time.scale().domain([start, end]).range([0, this.chartRange]);
-        return this.xAxis;
+        this.xScale = d3.time.scale().domain([start, end]).range([0, this.chartRange]);
+        return this.xScale;
     };
     TimelineChart.prototype.onMouseOver = function (svg, data, i) {
     };
@@ -207,14 +207,6 @@ var TimelineChart = (function () {
         return d.place;
     };
     /**
-     * Short form / Alias for setting daily business hours
-     * @param date
-     */
-    TimelineChart.prototype.setDate = function (date) {
-        var startTime = "00:00:00", endTime = "23:59:59";
-        this.setBusinessHours(new Date(date + " " + startTime), new Date(date + " " + endTime));
-    };
-    /**
      * Set domain for business hours to display in chart
      * @param start
      * @param end
@@ -224,6 +216,14 @@ var TimelineChart = (function () {
         this.chartEnd = end;
         // Update x axis scaling
         this.updateXAxis();
+    };
+    /**
+     * Short form / Alias for setting daily business hours
+     * @param date
+     */
+    TimelineChart.prototype.setDate = function (date) {
+        var startTime = "00:00:00", endTime = "23:59:59";
+        this.setBusinessHours(new Date(date + " " + startTime), new Date(date + " " + endTime));
     };
     // Timeline CSS Class Name, used to do some jQuery stuff.
     TimelineChart.scrollableTimelineClass = "timeline-scrollable";

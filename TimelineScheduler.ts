@@ -140,6 +140,7 @@ class TimelineScheduler {
    */
   public setData(data: any): void {
     this.chart.setData(data);
+    this.grouping.setData(data);
   }
 
   public clear(): void {

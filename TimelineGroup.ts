@@ -10,6 +10,7 @@ interface TimelineGroupInterface {
   setRowHeight(height: number): void;
   getRowHeight(): number;
   clearNodes(): void;
+  setData(data: any): void;
 }
 
 /**
@@ -25,7 +26,6 @@ class TimelineGroup implements TimelineGroupInterface {
   protected rowHeight: number = 21;
   public static leftPadding: number = 5;
   protected aHeight: number = 0;      // Overall height
-
 
   public constructor(dimension: Dimension) {
     if (!dimension) {
@@ -112,5 +112,9 @@ class TimelineGroup implements TimelineGroupInterface {
 
   public clearNodes(): void {
     this.svgInstance.selectAll("g").remove();
+  }
+
+  public setData(data: any): void {
+    this.aData = data;
   }
 }

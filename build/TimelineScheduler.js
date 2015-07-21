@@ -106,6 +106,7 @@ var TimelineScheduler = (function () {
      */
     TimelineScheduler.prototype.setData = function (data) {
         this.chart.setData(data);
+        this.grouping.setData(data);
     };
     TimelineScheduler.prototype.clear = function () {
         this.chart.clearNodes();

@@ -1,4 +1,4 @@
-# d3-awsp-timeline @version 0.1.0
+# d3-awsp-timeline @version 0.2.0
 Draw scheduler using d3.js library
 
 
