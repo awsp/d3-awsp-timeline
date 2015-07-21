@@ -8,10 +8,14 @@ interface TimelineChartInterface {
   setRowHeight(height: number): void;
   drawData(): void;
   labeling(d: any, i?: number): any;
-  setBusinessHours(start: Date, end: Date);
+  setDate(date: Date): void;
+  setBusinessHours(start: Date, end: Date): void;
   onMouseOver(svg: any, data: any, i: number): void;
   onMouseOut(svg: any, data: any, i: number): void;
   titleOnHover(svg: any): void;
+  clearAll(): void;
+  clearNodes(): void;
+  setData(data: any): void;
 }
 
 
@@ -91,6 +95,10 @@ class TimelineChart implements TimelineChartInterface {
     return this.dimension().width();
   }
 
+  public setData(data: any): void {
+    this.aData = data;
+  }
+
   /**
    * Set up chart, timeline
    * @param moduleName
@@ -165,7 +173,7 @@ class TimelineChart implements TimelineChartInterface {
    */
   public drawData(): void {
     var that = this;
-    var baseG = this.chartSvg.append("g").attr("transform", "translate(0, 0)");
+    var baseG = this.chartSvg.append("g").attr("transform", "translate(0, 0)").attr("class", "node-chart");
     var g = baseG.selectAll("g").data(d3.values(this.aData));
     var rowHeight: number = this.rowHeight;
 
@@ -279,11 +287,33 @@ class TimelineChart implements TimelineChartInterface {
     ;
   }
 
+  public clearAll(): void {
+    this.chartSvg.selectAll("*").remove();
+  }
+
+  public clearNodes(): void {
+    this.chartSvg.selectAll(".node-chart").remove();
+  }
+
   public labeling(d: any, i?: number): any {
     return d.place;
   }
 
-  public setBusinessHours(start: Date, end: Date) {
+  /**
+   * Short form / Alias for setting daily business hours
+   * @param date
+   */
+  public setDate(date: Date): void {
+    var startTime: string = "00:00:00", endTime: string = "23:59:59";
+    this.setBusinessHours(new Date(date + " " + startTime), new Date(date + " " + endTime));
+  }
+
+  /**
+   * Set domain for business hours to display in chart
+   * @param start
+   * @param end
+   */
+  public setBusinessHours(start: Date, end: Date): void {
     this.chartStart = start;
     this.chartEnd = end;
   }

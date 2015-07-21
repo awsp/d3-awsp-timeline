@@ -43,6 +43,9 @@ var TimelineChart = (function () {
     TimelineChart.prototype.width = function () {
         return this.dimension().width();
     };
+    TimelineChart.prototype.setData = function (data) {
+        this.aData = data;
+    };
     /**
      * Set up chart, timeline
      * @param moduleName
@@ -104,7 +107,7 @@ var TimelineChart = (function () {
     TimelineChart.prototype.drawData = function () {
         var _this = this;
         var that = this;
-        var baseG = this.chartSvg.append("g").attr("transform", "translate(0, 0)");
+        var baseG = this.chartSvg.append("g").attr("transform", "translate(0, 0)").attr("class", "node-chart");
         var g = baseG.selectAll("g").data(d3.values(this.aData));
         var rowHeight = this.rowHeight;
         var defFilter = baseG.append("defs").append("filter").attr({
@@ -181,9 +184,28 @@ var TimelineChart = (function () {
             return "fill: " + d.type.foregroundColor + "; font-size: " + (d.type.hasOwnProperty("fontSize") ? d.type.fontSize : 12) + "px";
         }).attr("dominant-baseline", "central");
     };
+    TimelineChart.prototype.clearAll = function () {
+        this.chartSvg.selectAll("*").remove();
+    };
+    TimelineChart.prototype.clearNodes = function () {
+        this.chartSvg.selectAll(".node-chart").remove();
+    };
     TimelineChart.prototype.labeling = function (d, i) {
         return d.place;
     };
+    /**
+     * Short form / Alias for setting daily business hours
+     * @param date
+     */
+    TimelineChart.prototype.setDate = function (date) {
+        var startTime = "00:00:00", endTime = "23:59:59";
+        this.setBusinessHours(new Date(date + " " + startTime), new Date(date + " " + endTime));
+    };
+    /**
+     * Set domain for business hours to display in chart
+     * @param start
+     * @param end
+     */
     TimelineChart.prototype.setBusinessHours = function (start, end) {
         this.chartStart = start;
         this.chartEnd = end;

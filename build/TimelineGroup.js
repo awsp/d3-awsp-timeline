@@ -68,6 +68,9 @@ var TimelineGroup = (function () {
             return rowHeight / 2;
         }).attr("text-anchor", "start");
     };
+    TimelineGroup.prototype.clearNodes = function () {
+        this.svgInstance.selectAll("g").remove();
+    };
     TimelineGroup.leftPadding = 5;
     return TimelineGroup;
 })();

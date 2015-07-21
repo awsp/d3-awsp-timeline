@@ -112,7 +112,7 @@ var workers = [
     firstName: "N",
     lastName: "Person"
   }
-]
+];
 var generateRandomTimeData = function (date, n, workers) {
   var data = [];
   var maximum = 4, minimum = 1;
@@ -188,3 +188,22 @@ grouping.setRowHeight(rowHeight);
 // Render
 var scheduler = new TimelineScheduler("#scheduler", dimension, data, chart, grouping);
 scheduler.render();
+
+
+(function ($, scheduler, workers) {
+  $(function () {
+    $("#clear").on("click", function () {
+      scheduler.clear();
+    });
+
+    $("#change-data").on("click", function () {
+      var newTestData = TimelineScheduler.processData(generateRandomTimeData("2015-07-14", 150, workers), "worker");
+      scheduler.setData(newTestData);
+      alert("data changed. ");
+    });
+
+    $("#draw").on("click", function () {
+      scheduler.render();
+    });
+  });
+})(jQuery, scheduler, workers);

@@ -9,6 +9,7 @@ interface TimelineGroupInterface {
   height(): d3.Primitive;
   setRowHeight(height: number): void;
   getRowHeight(): number;
+  clearNodes(): void;
 }
 
 /**
@@ -107,5 +108,9 @@ class TimelineGroup implements TimelineGroupInterface {
       })
       .attr("text-anchor", "start")
     ;
+  }
+
+  public clearNodes(): void {
+    this.svgInstance.selectAll("g").remove();
   }
 }
