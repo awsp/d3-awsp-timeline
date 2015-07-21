@@ -142,7 +142,7 @@ var data = TimelineScheduler.processData(testData, "worker");
 // TimelineChart
 var chart = new TimelineChart(new TwoDimensionalShape(800, 400));
 chart.setRowHeight(rowHeight);
-chart.setBusinessHours(new Date("2015-07-14 00:00:00"), new Date("2015-07-14 23:59:59"));
+chart.setBusinessHours(new Date("2015-07-14 00:00:00"), new Date("2015-07-15 03:59:59"));
 chart.onMouseOver = function (self, data, i) {
   if (data.type.id === "work") {
     d3.select(self).select("rect")
@@ -198,7 +198,7 @@ scheduler.render();
 
     $("#change-data").on("click", function () {
       var newTestData = TimelineScheduler.processData(generateRandomTimeData("2015-07-16", 150, workers), "worker");
-      scheduler.chart.setDate("2015-07-16");
+      scheduler.chart.setBusinessHours(new Date("2015-07-16 05:00:00"), new Date("2015-07-17 05:00:00"));
       scheduler.setData(newTestData);
       console.log("data and date changed. ");
     });

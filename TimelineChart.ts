@@ -17,6 +17,8 @@ interface TimelineChartInterface {
   clearNodes(): void;
   setData(data: any): void;
   updateXAxis(): any;
+  drawTimeline(): void;
+  clearTimeline(): void;
 }
 
 
@@ -56,6 +58,7 @@ class TimelineChart implements TimelineChartInterface {
 
   // Scaling - x direction
   protected xScale: any;
+  protected timelineSvg: any;
 
   // Chart output range, default to 2400
   protected chartRange: number = 2400;
@@ -104,6 +107,17 @@ class TimelineChart implements TimelineChartInterface {
     this.aData = data;
   }
 
+  public drawTimeline(): void {
+    var xScale = this.xScale = this.updateXAxis();
+    var xAxis = d3.svg.axis()
+      .scale(xScale)
+      .orient("top")
+      .ticks(d3.time.minutes, 30)
+      .tickSize(6)
+      .tickFormat(d3.time.format(this.axisFormat));
+    this.timelineSvg.append("g").attr("class", "axis").attr("transform", "translate(0, " + (TimelineChart.timelineHeight - 1) + ")").call(xAxis);
+  }
+
   /**
    * Set up chart, timeline
    * @param moduleName
@@ -132,20 +146,8 @@ class TimelineChart implements TimelineChartInterface {
     chartTimelineDom.attr("class", "chart-timeline").attr("style", "height: " + TimelineChart.timelineHeight + "px; ");
 
     // Timeline SVG
-    var timelineSvg = chartTimelineDom.append("svg");
+    var timelineSvg = this.timelineSvg = chartTimelineDom.append("svg");
     timelineSvg.attr("width", theoreticalWidth).attr("height", TimelineChart.timelineHeight);
-
-    // Timeline SVG timeline
-    var xScale = this.updateXAxis();
-    var xAxis = d3.svg.axis()
-      .scale(xScale)
-      .orient("top")
-      .ticks(d3.time.minutes, 30)
-      .tickSize(6)
-      .tickFormat(d3.time.format(this.axisFormat));
-    timelineSvg.append("g").attr("class", "axis").attr("transform", "translate(0, " + (TimelineChart.timelineHeight - 1) + ")").call(xAxis);
-
-    this.xScale = xScale;
 
     // Timeline Scrollable Div
     var chartScrollableDom = chartInnerDom.append("div");
@@ -187,6 +189,9 @@ class TimelineChart implements TimelineChartInterface {
    * Draw actual data onto the chart!
    */
   public drawData(): void {
+    // Timeline SVG timeline
+    this.drawTimeline();
+
     var that = this;
     var baseG = this.chartSvg.append("g").attr("transform", "translate(0, 0)").attr("class", "node-chart");
     var g = baseG.selectAll("g").data(d3.values(this.aData));
@@ -310,12 +315,16 @@ class TimelineChart implements TimelineChartInterface {
     this.chartSvg.selectAll(".node-chart").remove();
   }
 
+  public clearTimeline(): void {
+    this.timelineSvg.selectAll("g").remove();
+  }
+
   public labeling(d: any, i?: number): any {
     return d.place;
   }
 
   /**
-   * Set domain for business hours to display in chart
+   * Set domain for business hours to display in chart.
    * @param start
    * @param end
    */
