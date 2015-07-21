@@ -1,2 +1,2 @@
 build/* linguist-vendored
-dest/* linguist-vendored
+dist/* linguist-vendored
