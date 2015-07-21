@@ -186,6 +186,7 @@ class TimelineChart implements TimelineChartInterface {
 
   public onMouseOver(svg: any, data: any, i: number): void {}
   public onMouseOut(svg: any, data: any, i: number): void {}
+  public onClick(svg: any, data: any, i: number): void {}
   public titleOnHover(svg: any): void {}
 
   /**
@@ -252,6 +253,9 @@ class TimelineChart implements TimelineChartInterface {
       })
       .on("mouseout", function (d: any, i: number) {
         that.onMouseOut(this, d, i);
+      })
+      .on("click", function (d: any, i: number) {
+        that.onClick(this, d, i);
       })
     ;
 
@@ -325,6 +329,12 @@ class TimelineChart implements TimelineChartInterface {
     this.timelineSvg.selectAll("g").remove();
   }
 
+  /**
+   * Default data-binding on labels
+   * @param d
+   * @param i
+   * @returns {any}
+   */
   public labeling(d: any, i?: number): any {
     return d.place;
   }

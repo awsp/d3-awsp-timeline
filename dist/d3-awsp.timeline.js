@@ -248,6 +248,7 @@ var TimelineChart = (function () {
     };
     TimelineChart.prototype.onMouseOver = function (svg, data, i) { };
     TimelineChart.prototype.onMouseOut = function (svg, data, i) { };
+    TimelineChart.prototype.onClick = function (svg, data, i) { };
     TimelineChart.prototype.titleOnHover = function (svg) { };
     /**
      * Draw actual data onto the chart!
@@ -305,6 +306,9 @@ var TimelineChart = (function () {
         })
             .on("mouseout", function (d, i) {
             that.onMouseOut(this, d, i);
+        })
+            .on("click", function (d, i) {
+            that.onClick(this, d, i);
         });
         blockG.append("rect")
             .attr("fill", function (d) {
@@ -367,6 +371,12 @@ var TimelineChart = (function () {
     TimelineChart.prototype.clearTimeline = function () {
         this.timelineSvg.selectAll("g").remove();
     };
+    /**
+     * Default data-binding on labels
+     * @param d
+     * @param i
+     * @returns {any}
+     */
     TimelineChart.prototype.labeling = function (d, i) {
         return d.place;
     };

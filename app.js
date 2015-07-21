@@ -113,6 +113,7 @@ var workers = [
     lastName: "Person"
   }
 ];
+// Generate some random data to display
 var generateRandomTimeData = function (date, n, workers) {
   var data = [];
   var maximum = 4, minimum = 1;
@@ -144,7 +145,7 @@ var chart = new TimelineChart(new TwoDimensionalShape(800, 400));
 chart.setRowHeight(rowHeight);
 chart.setBusinessHours(new Date("2015-07-14 00:00:00"), new Date("2015-07-15 03:59:59"));
 chart.onMouseOver = function (self, data, i) {
-  if (data.type.id === "work") {
+  if (data.type.id === "work" && ! d3.select(self).classed("selected")) {
     d3.select(self).select("rect")
       .transition()
       .duration(300)
@@ -156,7 +157,7 @@ chart.onMouseOver = function (self, data, i) {
   }
 };
 chart.onMouseOut = function (self, data, i) {
-  if (data.type.id === "work") {
+  if (data.type.id === "work" && ! d3.select(self).classed("selected")) {
     d3.select(self).select("rect")
       .transition()
       .duration(150)
@@ -179,17 +180,41 @@ chart.labeling = function (data, i) {
   return data.place;
 };
 
+chart.onClick = function (self, data, i) {
+  if (data.type.id === "work") {
+    d3.select(self).attr("class", function () {
+      if (d3.select(self).classed("selected")) {
+        return d3.select(this).attr("class").replace(/selected/, "");
+      }
+      return d3.select(this).attr("class") + " selected";
+    });
+    d3.select(self).select("rect")
+      .transition()
+      .duration(150)
+    ;
+  }
+};
+
 
 // Timeline Group
 var grouping = new TimelineGroup(new TwoDimensionalShape(100, 400));
 grouping.setRowHeight(rowHeight);
 
 
-// Render
+// Render Scheduler
 var scheduler = new TimelineScheduler("#scheduler", dimension, data, chart, grouping);
 scheduler.render();
 
 
+// Keyboard Capture
+d3.select("body").on("keydown", function () {
+  if (d3.event.keyCode === 27) {
+    d3.select("#scheduler").selectAll(".selected").classed("selected", "");
+  }
+});
+
+
+// Button Controls
 (function ($, scheduler, workers) {
   $(function () {
     $("#clear").on("click", function () {

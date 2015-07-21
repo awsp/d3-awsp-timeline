@@ -114,6 +114,8 @@ var TimelineChart = (function () {
     };
     TimelineChart.prototype.onMouseOut = function (svg, data, i) {
     };
+    TimelineChart.prototype.onClick = function (svg, data, i) {
+    };
     TimelineChart.prototype.titleOnHover = function (svg) {
     };
     /**
@@ -163,6 +165,8 @@ var TimelineChart = (function () {
             that.onMouseOver(this, d, i);
         }).on("mouseout", function (d, i) {
             that.onMouseOut(this, d, i);
+        }).on("click", function (d, i) {
+            that.onClick(this, d, i);
         });
         blockG.append("rect").attr("fill", function (d) {
             return d.type.backgroundColor;
@@ -212,6 +216,12 @@ var TimelineChart = (function () {
     TimelineChart.prototype.clearTimeline = function () {
         this.timelineSvg.selectAll("g").remove();
     };
+    /**
+     * Default data-binding on labels
+     * @param d
+     * @param i
+     * @returns {any}
+     */
     TimelineChart.prototype.labeling = function (d, i) {
         return d.place;
     };
