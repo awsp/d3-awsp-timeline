@@ -181,6 +181,16 @@ var TimelineChart = (function () {
     TimelineChart.prototype.setData = function (data) {
         this.aData = data;
     };
+    TimelineChart.prototype.drawTimeline = function () {
+        var xScale = this.xScale = this.updateXAxis();
+        var xAxis = d3.svg.axis()
+            .scale(xScale)
+            .orient("top")
+            .ticks(d3.time.minutes, 30)
+            .tickSize(6)
+            .tickFormat(d3.time.format(this.axisFormat));
+        this.timelineSvg.attr("width", this.chartRange).attr("class", "changed").append("g").attr("class", "axis").attr("transform", "translate(0, " + (TimelineChart.timelineHeight - 1) + ")").call(xAxis);
+    };
     /**
      * Set up chart, timeline
      * @param moduleName
@@ -206,17 +216,8 @@ var TimelineChart = (function () {
         chartTimelineDom.attr("class", "chart-timeline").attr("style", "height: " + TimelineChart.timelineHeight + "px; ");
         // Timeline SVG
         var timelineSvg = chartTimelineDom.append("svg");
-        timelineSvg.attr("width", theoreticalWidth).attr("height", TimelineChart.timelineHeight);
-        // Timeline SVG timeline
-        var xScale = this.updateXAxis();
-        var xAxis = d3.svg.axis()
-            .scale(xScale)
-            .orient("top")
-            .ticks(d3.time.minutes, 30)
-            .tickSize(6)
-            .tickFormat(d3.time.format(this.axisFormat));
-        timelineSvg.append("g").attr("class", "axis").attr("transform", "translate(0, " + (TimelineChart.timelineHeight - 1) + ")").call(xAxis);
-        this.xScale = xScale;
+        timelineSvg.attr("height", TimelineChart.timelineHeight);
+        this.timelineSvg = timelineSvg;
         // Timeline Scrollable Div
         var chartScrollableDom = chartInnerDom.append("div");
         var remainingWidth = this.dimension().height() - TimelineChart.timelineHeight;
@@ -241,6 +242,7 @@ var TimelineChart = (function () {
     TimelineChart.prototype.updateXAxis = function () {
         var start = this.chartStart.getTime();
         var end = this.chartEnd.getTime();
+        this.chartRange = (end - start) / 36000;
         this.xScale = d3.time.scale().domain([start, end]).range([0, this.chartRange]);
         return this.xScale;
     };
@@ -252,6 +254,10 @@ var TimelineChart = (function () {
      */
     TimelineChart.prototype.drawData = function () {
         var _this = this;
+        // Timeline SVG timeline
+        this.drawTimeline();
+        // Update length
+        this.chartSvg.attr("width", this.chartRange);
         var that = this;
         var baseG = this.chartSvg.append("g").attr("transform", "translate(0, 0)").attr("class", "node-chart");
         var g = baseG.selectAll("g").data(d3.values(this.aData));
@@ -358,11 +364,14 @@ var TimelineChart = (function () {
     TimelineChart.prototype.clearNodes = function () {
         this.chartSvg.selectAll(".node-chart").remove();
     };
+    TimelineChart.prototype.clearTimeline = function () {
+        this.timelineSvg.selectAll("g").remove();
+    };
     TimelineChart.prototype.labeling = function (d, i) {
         return d.place;
     };
     /**
-     * Set domain for business hours to display in chart
+     * Set domain for business hours to display in chart.
      * @param start
      * @param end
      */
@@ -500,6 +509,7 @@ var TimelineScheduler = (function () {
     };
     TimelineScheduler.prototype.clear = function () {
         this.chart.clearNodes();
+        this.chart.clearTimeline();
         this.grouping.clearNodes();
     };
     /**

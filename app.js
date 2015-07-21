@@ -198,9 +198,9 @@ scheduler.render();
 
     $("#change-data").on("click", function () {
       var newTestData = TimelineScheduler.processData(generateRandomTimeData("2015-07-16", 150, workers), "worker");
-      scheduler.chart.setBusinessHours(new Date("2015-07-16 05:00:00"), new Date("2015-07-17 05:00:00"));
+      scheduler.chart.setBusinessHours(new Date("2015-07-16 04:00:00"), new Date("2015-07-17 14:00:00"));
       scheduler.setData(newTestData);
-      console.log("data and date changed. ");
+      console.log("data and date range changed. ");
     });
 
     $("#change-workers").on("click", function () {

@@ -115,7 +115,7 @@ class TimelineChart implements TimelineChartInterface {
       .ticks(d3.time.minutes, 30)
       .tickSize(6)
       .tickFormat(d3.time.format(this.axisFormat));
-    this.timelineSvg.append("g").attr("class", "axis").attr("transform", "translate(0, " + (TimelineChart.timelineHeight - 1) + ")").call(xAxis);
+    this.timelineSvg.attr("width", this.chartRange).attr("class", "changed").append("g").attr("class", "axis").attr("transform", "translate(0, " + (TimelineChart.timelineHeight - 1) + ")").call(xAxis);
   }
 
   /**
@@ -146,8 +146,9 @@ class TimelineChart implements TimelineChartInterface {
     chartTimelineDom.attr("class", "chart-timeline").attr("style", "height: " + TimelineChart.timelineHeight + "px; ");
 
     // Timeline SVG
-    var timelineSvg = this.timelineSvg = chartTimelineDom.append("svg");
-    timelineSvg.attr("width", theoreticalWidth).attr("height", TimelineChart.timelineHeight);
+    var timelineSvg = chartTimelineDom.append("svg");
+    timelineSvg.attr("height", TimelineChart.timelineHeight);
+    this.timelineSvg = timelineSvg;
 
     // Timeline Scrollable Div
     var chartScrollableDom = chartInnerDom.append("div");
@@ -177,6 +178,8 @@ class TimelineChart implements TimelineChartInterface {
   public updateXAxis(): any {
     var start: number = this.chartStart.getTime();
     var end: number = this.chartEnd.getTime();
+    this.chartRange = (end - start) / 36000;
+
     this.xScale = d3.time.scale().domain([start, end]).range([0, this.chartRange]);
     return this.xScale;
   }
@@ -191,6 +194,9 @@ class TimelineChart implements TimelineChartInterface {
   public drawData(): void {
     // Timeline SVG timeline
     this.drawTimeline();
+
+    // Update length
+    this.chartSvg.attr("width", this.chartRange);
 
     var that = this;
     var baseG = this.chartSvg.append("g").attr("transform", "translate(0, 0)").attr("class", "node-chart");
