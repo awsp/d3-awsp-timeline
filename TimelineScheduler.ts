@@ -129,7 +129,6 @@ class TimelineScheduler {
 
     // Scrolling
     $("." + TimelineChart.scrollableTimelineClass, this.targetName).on("scroll", function () {
-      console.log('here');
       $("." + TimelineScheduler.listModuleClass, this.targetName).scrollTop($(this).scrollTop());
       $("." + TimelineScheduler.chartTimelineClass, this.targetName).scrollLeft($(this).scrollLeft());
     });

@@ -16,6 +16,7 @@ interface TimelineChartInterface {
   clearAll(): void;
   clearNodes(): void;
   setData(data: any): void;
+  updateXAxis(): any;
 }
 
 
@@ -62,10 +63,15 @@ class TimelineChart implements TimelineChartInterface {
   // Business hours
   protected chartStart: Date = null;
   protected chartEnd: Date = null;
+  protected xAxis: any;
 
   // X Axis Format
   public axisFormat: string = "%I:%M";
 
+  /**
+   * Constructor
+   * @param dimension
+   */
   public constructor(dimension: Dimension) {
     if (!dimension) {
       throw new Error("Dimension is not set. ");
@@ -131,9 +137,7 @@ class TimelineChart implements TimelineChartInterface {
     timelineSvg.attr("width", theoreticalWidth).attr("height", TimelineChart.timelineHeight);
 
     // Timeline SVG timeline
-    var start: number = this.chartStart.getTime();
-    var end: number = this.chartEnd.getTime();
-    var xScale = d3.time.scale().domain([start, end]).range([0, theoreticalWidth]);
+    var xScale = this.updateXAxis();
     var xAxis = d3.svg.axis()
       .scale(xScale)
       .orient("top")
@@ -162,6 +166,18 @@ class TimelineChart implements TimelineChartInterface {
 
     this.chartModuleDom = chartModuleDom;
     this.chartSvg = chartSvg;
+  }
+
+  /**
+   * This will re-calculate and update the current x axis scaling.
+   * Shall be called, after changing business hours, or chart width.
+   * @returns {d3.time.Scale<any, number>}
+   */
+  public updateXAxis(): any {
+    var start: number = this.chartStart.getTime();
+    var end: number = this.chartEnd.getTime();
+    this.xAxis = d3.time.scale().domain([start, end]).range([0, this.chartRange]);
+    return this.xAxis;
   }
 
   public onMouseOver(svg: any, data: any, i: number): void {}
@@ -316,5 +332,8 @@ class TimelineChart implements TimelineChartInterface {
   public setBusinessHours(start: Date, end: Date): void {
     this.chartStart = start;
     this.chartEnd = end;
+
+    // Update x axis scaling
+    this.updateXAxis();
   }
 }

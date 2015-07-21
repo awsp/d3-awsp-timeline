@@ -134,6 +134,10 @@ var TimelineGroup = (function () {
  * Represent chart part of scheduler
  */
 var TimelineChart = (function () {
+    /**
+     * Constructor
+     * @param dimension
+     */
     function TimelineChart(dimension) {
         // Root DOM
         this.chartModuleDom = null;
@@ -201,9 +205,7 @@ var TimelineChart = (function () {
         var timelineSvg = chartTimelineDom.append("svg");
         timelineSvg.attr("width", theoreticalWidth).attr("height", TimelineChart.timelineHeight);
         // Timeline SVG timeline
-        var start = this.chartStart.getTime();
-        var end = this.chartEnd.getTime();
-        var xScale = d3.time.scale().domain([start, end]).range([0, theoreticalWidth]);
+        var xScale = this.updateXAxis();
         var xAxis = d3.svg.axis()
             .scale(xScale)
             .orient("top")
@@ -227,6 +229,17 @@ var TimelineChart = (function () {
         chartSvg.append("g").attr("class", "grid").attr("transform", "translate(0," + theoreticalWidth + ")").call(xGrid);
         this.chartModuleDom = chartModuleDom;
         this.chartSvg = chartSvg;
+    };
+    /**
+     * This will re-calculate and update the current x axis scaling.
+     * Shall be called, after changing business hours, or chart width.
+     * @returns {d3.time.Scale<any, number>}
+     */
+    TimelineChart.prototype.updateXAxis = function () {
+        var start = this.chartStart.getTime();
+        var end = this.chartEnd.getTime();
+        this.xAxis = d3.time.scale().domain([start, end]).range([0, this.chartRange]);
+        return this.xAxis;
     };
     TimelineChart.prototype.onMouseOver = function (svg, data, i) { };
     TimelineChart.prototype.onMouseOut = function (svg, data, i) { };
@@ -361,6 +374,8 @@ var TimelineChart = (function () {
     TimelineChart.prototype.setBusinessHours = function (start, end) {
         this.chartStart = start;
         this.chartEnd = end;
+        // Update x axis scaling
+        this.updateXAxis();
     };
     // Timeline CSS Class Name, used to do some jQuery stuff.
     TimelineChart.scrollableTimelineClass = "timeline-scrollable";
@@ -468,7 +483,6 @@ var TimelineScheduler = (function () {
         this.chart.init(this.targetStem, aTargetInner, this.aData, this.grouping.dimension().width());
         // Scrolling
         $("." + TimelineChart.scrollableTimelineClass, this.targetName).on("scroll", function () {
-            console.log('here');
             $("." + TimelineScheduler.listModuleClass, this.targetName).scrollTop($(this).scrollTop());
             $("." + TimelineScheduler.chartTimelineClass, this.targetName).scrollLeft($(this).scrollLeft());
         });
