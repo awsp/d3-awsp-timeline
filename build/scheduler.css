@@ -123,6 +123,10 @@ body {
   fill: #ff0000;
   stroke: #ff0000;
 }
+.scheduler-module .chart-module .overlapping {
+  fill: #ff0000;
+  stroke: #ff0000;
+}
 .even {
   fill: #ffffff;
 }

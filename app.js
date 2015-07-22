@@ -2,6 +2,7 @@
 var rowHeight = 42;
 
 // Types of Bar
+// TODO: create a class for type, and type collection
 var types = [
   {
     id: "availability",
@@ -11,7 +12,8 @@ var types = [
     opacity: 0.4,
     height: rowHeight,
     hasLabel: false,
-    zIndex: 0
+    zIndex: 0,
+    markOverlap: false
   },
   {
     id: "busy",
@@ -21,7 +23,8 @@ var types = [
     opacity: 0.4,
     height: rowHeight,
     hasLabel: false,
-    zIndex: 1
+    zIndex: 1,
+    markOverlap: false
   },
   {
     id: "work",
@@ -35,7 +38,9 @@ var types = [
     round: 3,
     hasLabel: true,
     fontSize: 11,
-    zIndex: 2
+    zIndex: 2,
+    markOverlap: true,
+    overlapClass: "overlapping"
   }
 ];
 
@@ -138,7 +143,6 @@ var generateRandomTimeData = function (date, n, workers) {
 };
 var testData = generateRandomTimeData("2015-07-14", 150, workers);
 var data = TimelineScheduler.processData(testData, "worker");
-
 
 // TimelineChart
 var chart = new TimelineChart(new TwoDimensionalShape(800, 400));
