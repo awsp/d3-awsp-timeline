@@ -1,5 +1,5 @@
 // Configuration
-var rowHeight = 50;
+var rowHeight = 42;
 
 // Types of Bar
 var types = [
@@ -28,8 +28,8 @@ var types = [
     name: "Working Schedule",
     backgroundColor: "#4D82CC",
     foregroundColor: "#fff",
-    opacity: 0.72,
-    height: 24,
+    opacity: 0.7,
+    height: 28,
     stroke: "#4D82CC",
     strokeWidth: 3,
     round: 3,
