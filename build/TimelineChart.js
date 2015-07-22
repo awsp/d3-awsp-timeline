@@ -260,7 +260,9 @@ var TimelineChart = (function () {
     TimelineChart.prototype.showTooltip = function (currentInstance) {
         var _this = this;
         this.tooltip.transition().duration(300).attr("style", function () {
-            var currentRow = d3.select(currentInstance).node().parentNode;
+            var currentRow = d3.select(currentInstance).select(function () {
+                return this.parentNode;
+            }).node();
             var currentY = +d3.select(currentRow).attr("data-y");
             var halfed = (currentY - $("." + TimelineChart.scrollableTimelineClass, "#" + _this.moduleName).scrollTop()) > ($("#" + _this.moduleName).height() / 2);
             var offset = halfed ? 95 : -35;

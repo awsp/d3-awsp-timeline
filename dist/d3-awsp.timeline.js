@@ -49,10 +49,16 @@ var TwoDimensionalShape = (function () {
  */
 var TimelineGroup = (function () {
     function TimelineGroup(dimension) {
-        this.domInstance = null; // DOM root element
-        this.svgInstance = null; // SVG root element
+        // DOM root element
+        this.domInstance = null;
+        // SVG root element
+        this.svgInstance = null;
+        // Row's height, default to 21
         this.rowHeight = 21;
-        this.aHeight = 0; // Overall height
+        // Overall height
+        this.aHeight = 0;
+        // Text width, used to calcalate truncate position
+        this.textFactorBase = 9;
         if (!dimension) {
             throw new Error("Dimension is not set. ");
         }
@@ -71,6 +77,12 @@ var TimelineGroup = (function () {
     TimelineGroup.prototype.getRowHeight = function () {
         return this.rowHeight;
     };
+    /**
+     * Initialize the base dom and svg elements.
+     * @param moduleName
+     * @param gParent
+     * @param data
+     */
     TimelineGroup.prototype.init = function (moduleName, gParent, data) {
         this.gParent = gParent;
         this.moduleName = moduleName;
@@ -90,7 +102,12 @@ var TimelineGroup = (function () {
         this.domInstance = domInstance;
         this.svgInstance = svgInstance;
     };
+    /**
+     * Draw the data out based on given data.
+     * @param data
+     */
     TimelineGroup.prototype.drawData = function (data) {
+        var _this = this;
         // Allow data to override original value.
         if (!data) {
             data = this.aData;
@@ -109,6 +126,10 @@ var TimelineGroup = (function () {
         });
         gEnter.append("text")
             .text(function (d) {
+            var factor = _this.getTextFactor(d[0].worker);
+            if (d[0].worker.length > factor) {
+                return d[0].worker.substring(0, factor) + "...";
+            }
             return d[0].worker;
         })
             .attr("dominant-baseline", "central")
@@ -120,17 +141,42 @@ var TimelineGroup = (function () {
         })
             .attr("text-anchor", "start");
     };
+    /**
+     * Get factor of a text string
+     * @param text
+     * @returns {number}
+     */
+    TimelineGroup.prototype.getTextFactor = function (text) {
+        var factor;
+        factor = this.dimension().width() / this.textFactorBase;
+        if (TimelineGroup.containsNonLatinCodepoints(text)) {
+            factor /= 2;
+        }
+        return factor;
+    };
     TimelineGroup.prototype.clearNodes = function () {
         this.svgInstance.selectAll("g").remove();
     };
     TimelineGroup.prototype.setData = function (data) {
         this.aData = data;
     };
+    /**
+     * Test if a string contains non-latin characters
+     * Reference:
+     *   http://stackoverflow.com/questions/147824/how-to-find-whether-a-particular-string-has-unicode-characters-esp-double-byte
+     * @param text
+     * @returns {boolean}
+     */
+    TimelineGroup.containsNonLatinCodepoints = function (text) {
+        return /[^\u0000-\u00ff]/.test(text);
+    };
+    // Left padding of text
     TimelineGroup.leftPadding = 5;
     return TimelineGroup;
 })();
 ///<reference path="DefinitelyTyped/d3/d3.d.ts" />
 ///<reference path="DefinitelyTyped/underscore/underscore.d.ts" />
+///<reference path="DefinitelyTyped/jquery/jquery.d.ts" />
 ///<reference path="Dimension.ts" />
 ///<reference path="TimelineGroup.ts" />
 /**
@@ -231,6 +277,9 @@ var TimelineChart = (function () {
         var xGridScale = d3.scale.linear().domain([0, theoreticalWidth]).range([0, theoreticalWidth]);
         var xGrid = d3.svg.axis().scale(xGridScale).orient("bottom").ticks(ticks).tickFormat("").tickSize(-theoreticalWidth, 0);
         chartSvg.append("g").attr("class", "grid").attr("transform", "translate(0," + theoreticalWidth + ")").call(xGrid);
+        // Tooltip
+        this.tooltip = chartScrollableDom.append("div").attr("class", "tooltip").style("opacity", 0);
+        this.tooltipInner = this.tooltip.append("foreignObject").append("div").attr("class", "inner");
         this.chartModuleDom = chartModuleDom;
         this.chartSvg = chartSvg;
     };
@@ -249,7 +298,7 @@ var TimelineChart = (function () {
     TimelineChart.prototype.onMouseOver = function (svg, data, i) { };
     TimelineChart.prototype.onMouseOut = function (svg, data, i) { };
     TimelineChart.prototype.onClick = function (svg, data, i) { };
-    TimelineChart.prototype.titleOnHover = function (svg) { };
+    TimelineChart.prototype.titleOnHover = function (svg, instance) { };
     /**
      * Draw actual data onto the chart!
      */
@@ -292,6 +341,8 @@ var TimelineChart = (function () {
         });
         var gEnter = g.enter().append("g").attr("class", "chart-row").attr("transform", function (d, i) {
             return "translate(0, " + rowHeight * i + ")";
+        }).attr("data-y", function (d, i) {
+            return rowHeight * i;
         });
         var blockG = gEnter.selectAll("g").data(function (d, i) {
             return d;
@@ -301,6 +352,9 @@ var TimelineChart = (function () {
             return "translate(" + _this.xScale(d.starting_time) + ", 0)";
         })
             .attr("class", "block")
+            .attr("data-x", function (d) {
+            return _this.xScale(d.starting_time);
+        })
             .on("mouseover", function (d, i) {
             that.onMouseOver(this, d, i);
         })
@@ -346,7 +400,7 @@ var TimelineChart = (function () {
         var titleDesc = blockG.filter(function (d) {
             return !!(d.type.hasOwnProperty("hasLabel") && d.type.hasLabel === true);
         }).append("svg:title");
-        this.titleOnHover(titleDesc);
+        this.titleOnHover(titleDesc, this);
         blockG.filter(function (d) {
             return !!(d.type.hasOwnProperty("hasLabel") && d.type.hasLabel === true);
         }).append("text")
@@ -398,6 +452,30 @@ var TimelineChart = (function () {
     TimelineChart.prototype.setDate = function (date) {
         var startTime = "00:00:00", endTime = "23:59:59";
         this.setBusinessHours(new Date(date + " " + startTime), new Date(date + " " + endTime));
+    };
+    /**
+     * Show tooltip of the current hovering object
+     * TODO: offset is using fixed number.
+     * @returns {any}
+     */
+    TimelineChart.prototype.showTooltip = function (currentInstance) {
+        var _this = this;
+        this.tooltip.transition().duration(300).attr("style", function () {
+            var currentRow = d3.select(currentInstance).select(function () {
+                return this.parentNode;
+            }).node();
+            var currentY = +d3.select(currentRow).attr("data-y");
+            var halfed = (currentY - $("." + TimelineChart.scrollableTimelineClass, "#" + _this.moduleName).scrollTop()) > ($("#" + _this.moduleName).height() / 2);
+            var offset = halfed ? 95 : -35;
+            return "opacity: 1; left: " + d3.select(currentInstance).attr("data-x") + "px; top: " + (+d3.select(currentRow).attr("data-y") - offset) + "px";
+        });
+        return this.tooltipInner;
+    };
+    TimelineChart.prototype.hideTooltip = function () {
+        this.tooltip.attr("style", function () {
+            return "opacity: 0;";
+        });
+        return this.tooltipInner;
     };
     // Timeline CSS Class Name, used to do some jQuery stuff.
     TimelineChart.scrollableTimelineClass = "timeline-scrollable";

@@ -384,7 +384,9 @@ class TimelineChart implements TimelineChartInterface {
    */
   public showTooltip(currentInstance: any): any {
     this.tooltip.transition().duration(300).attr("style", () => {
-      var currentRow: any = d3.select(currentInstance).node().parentNode;
+      var currentRow: any = d3.select(currentInstance).select(function () {
+        return this.parentNode;
+      }).node();
       var currentY = +d3.select(currentRow).attr("data-y");
       var halfed: boolean = (currentY - $("." + TimelineChart.scrollableTimelineClass, "#" + this.moduleName).scrollTop()) > ($("#" + this.moduleName).height() / 2);
       var offset: number = halfed ? 95 : -35;
