@@ -1,5 +1,6 @@
 ///<reference path="DefinitelyTyped/d3/d3.d.ts" />
 ///<reference path="DefinitelyTyped/underscore/underscore.d.ts" />
+///<reference path="DefinitelyTyped/jquery/jquery.d.ts" />
 ///<reference path="Dimension.ts" />
 ///<reference path="TimelineGroup.ts" />
 /**
@@ -95,6 +96,9 @@ var TimelineChart = (function () {
         var xGridScale = d3.scale.linear().domain([0, theoreticalWidth]).range([0, theoreticalWidth]);
         var xGrid = d3.svg.axis().scale(xGridScale).orient("bottom").ticks(ticks).tickFormat("").tickSize(-theoreticalWidth, 0);
         chartSvg.append("g").attr("class", "grid").attr("transform", "translate(0," + theoreticalWidth + ")").call(xGrid);
+        // Tooltip
+        this.tooltip = chartScrollableDom.append("div").attr("class", "tooltip").style("opacity", 0);
+        this.tooltipInner = this.tooltip.append("foreignObject").append("div").attr("class", "inner");
         this.chartModuleDom = chartModuleDom;
         this.chartSvg = chartSvg;
     };
@@ -116,7 +120,7 @@ var TimelineChart = (function () {
     };
     TimelineChart.prototype.onClick = function (svg, data, i) {
     };
-    TimelineChart.prototype.titleOnHover = function (svg) {
+    TimelineChart.prototype.titleOnHover = function (svg, instance) {
     };
     /**
      * Draw actual data onto the chart!
@@ -156,12 +160,16 @@ var TimelineChart = (function () {
         });
         var gEnter = g.enter().append("g").attr("class", "chart-row").attr("transform", function (d, i) {
             return "translate(0, " + rowHeight * i + ")";
+        }).attr("data-y", function (d, i) {
+            return rowHeight * i;
         });
         var blockG = gEnter.selectAll("g").data(function (d, i) {
             return d;
         }).enter().append("g").attr("transform", function (d) {
             return "translate(" + _this.xScale(d.starting_time) + ", 0)";
-        }).attr("class", "block").on("mouseover", function (d, i) {
+        }).attr("class", "block").attr("data-x", function (d) {
+            return _this.xScale(d.starting_time);
+        }).on("mouseover", function (d, i) {
             that.onMouseOver(this, d, i);
         }).on("mouseout", function (d, i) {
             that.onMouseOut(this, d, i);
@@ -196,7 +204,7 @@ var TimelineChart = (function () {
         var titleDesc = blockG.filter(function (d) {
             return !!(d.type.hasOwnProperty("hasLabel") && d.type.hasLabel === true);
         }).append("svg:title");
-        this.titleOnHover(titleDesc);
+        this.titleOnHover(titleDesc, this);
         blockG.filter(function (d) {
             return !!(d.type.hasOwnProperty("hasLabel") && d.type.hasLabel === true);
         }).append("text").text(that.labeling).attr("dx", function (d) {
@@ -243,6 +251,30 @@ var TimelineChart = (function () {
     TimelineChart.prototype.setDate = function (date) {
         var startTime = "00:00:00", endTime = "23:59:59";
         this.setBusinessHours(new Date(date + " " + startTime), new Date(date + " " + endTime));
+    };
+    /**
+     * Show tooltip of the current hovering object
+     * TODO: offset is using fixed number.
+     * @returns {any}
+     */
+    TimelineChart.prototype.showTooltip = function (currentInstance) {
+        var _this = this;
+        this.tooltip.transition().duration(300).attr("style", function () {
+            var currentRow = d3.select(currentInstance).select(function () {
+                return this.parentNode;
+            }).node();
+            var currentY = +d3.select(currentRow).attr("data-y");
+            var halfed = (currentY - $("." + TimelineChart.scrollableTimelineClass, "#" + _this.moduleName).scrollTop()) > ($("#" + _this.moduleName).height() / 2);
+            var offset = halfed ? 95 : -35;
+            return "opacity: 1; left: " + d3.select(currentInstance).attr("data-x") + "px; top: " + (+d3.select(currentRow).attr("data-y") - offset) + "px";
+        });
+        return this.tooltipInner;
+    };
+    TimelineChart.prototype.hideTooltip = function () {
+        this.tooltip.attr("style", function () {
+            return "opacity: 0;";
+        });
+        return this.tooltipInner;
     };
     // Timeline CSS Class Name, used to do some jQuery stuff.
     TimelineChart.scrollableTimelineClass = "timeline-scrollable";

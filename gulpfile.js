@@ -34,7 +34,10 @@ gulp.task('compile-one', function () {
 
   gulp.src(['./*.ts'])
     .pipe(typescript({
-      out: outFileStem + '.js'
+      out: outFileStem + '.js',
+      //isolatedCompilation: true,
+      //noExternalResolve: true,
+      noEmitOnError: false
     }))
     .pipe(gulp.dest(out))
     .on('end', function () {

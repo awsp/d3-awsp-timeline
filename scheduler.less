@@ -1,3 +1,13 @@
+/* Variables */
+@tooltipBorderColor: #5f5f5f;
+@borderColor: #ccc;
+@selectedBlockColor: #f00;
+@rowEvenColor: #ffffff;
+@rowOddColor: #efefef;
+@tooltipBackground: rgba(0, 0, 0, 0.6);
+
+
+/* Common Classes */
 .fl { float: left; }
 .fr { float: right; }
 .clear { clear: both; }
@@ -27,7 +37,8 @@
 }
 
 
-html, body {
+/* App */
+html, body, ul, li, p, h1, h2, h3, h4, h5, h6 {
   .reset;
 }
 body {
@@ -36,8 +47,6 @@ body {
   color: #444;
 }
 
-
-@borderColor: #ccc;
 .scheduler-module {
   .no-overflow;
   border: 1px solid @borderColor;
@@ -52,6 +61,31 @@ body {
     .fl;
     .no-overflow;
     background: #fff;
+  }
+
+  .tooltip {
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 1000;
+    width: 320px;
+    height: 100px;
+    background: @tooltipBackground;
+    border: 1px solid @tooltipBorderColor;
+    border-radius: 3px;
+
+    .inner {
+      color: white;
+      padding: 6px;
+    }
+    #close-tooltip {
+      .absolute;
+      color: white;
+      right: 6px;
+      top: 3px;
+      text-decoration: none;
+      cursor: default;
+    }
   }
 
   .chart-module {
@@ -69,12 +103,17 @@ body {
     }
     .timeline-scrollable {
       .overflow;
+      .relative;
+    }
+    .selected rect {
+      fill: @selectedBlockColor;
+      stroke: @selectedBlockColor;
     }
   }
 }
 
-.even { fill: #fff; }
-.odd { fill: #efefef; }
+.even { fill: @rowEvenColor; }
+.odd { fill: @rowOddColor; }
 
 .axis {
   path, line {
@@ -102,7 +141,4 @@ body {
   stroke-width: 0;
 }
 
-.selected rect {
-  fill: #f00;
-  stroke: #f00;
-}
+

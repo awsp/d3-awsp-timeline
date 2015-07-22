@@ -1,5 +1,6 @@
 ///<reference path="DefinitelyTyped/d3/d3.d.ts" />
 ///<reference path="DefinitelyTyped/underscore/underscore.d.ts" />
+///<reference path="DefinitelyTyped/jquery/jquery.d.ts" />
 ///<reference path="Dimension.ts" />
 ///<reference path="TimelineGroup.ts" />
 
@@ -12,13 +13,15 @@ interface TimelineChartInterface {
   setBusinessHours(start: Date, end: Date): void;
   onMouseOver(svg: any, data: any, i: number): void;
   onMouseOut(svg: any, data: any, i: number): void;
-  titleOnHover(svg: any): void;
+  titleOnHover(svg: any, instance: any): void;
   clearAll(): void;
   clearNodes(): void;
   setData(data: any): void;
   updateXAxis(): any;
   drawTimeline(): void;
   clearTimeline(): void;
+  showTooltip(currentInstance: any): any;
+  hideTooltip(): any;
 }
 
 
@@ -69,6 +72,10 @@ class TimelineChart implements TimelineChartInterface {
 
   // X Axis Format
   public axisFormat: string = "%I:%M";
+
+  // Tooltip
+  public tooltip: any;
+  public tooltipInner: any;
 
   /**
    * Constructor
@@ -166,6 +173,10 @@ class TimelineChart implements TimelineChartInterface {
     var xGrid = d3.svg.axis().scale(xGridScale).orient("bottom").ticks(ticks).tickFormat("").tickSize(-theoreticalWidth, 0);
     chartSvg.append("g").attr("class", "grid").attr("transform", "translate(0," + theoreticalWidth + ")").call(xGrid);
 
+    // Tooltip
+    this.tooltip = chartScrollableDom.append("div").attr("class", "tooltip").style("opacity", 0);
+    this.tooltipInner = this.tooltip.append("foreignObject").append("div").attr("class", "inner");
+
     this.chartModuleDom = chartModuleDom;
     this.chartSvg = chartSvg;
   }
@@ -187,7 +198,7 @@ class TimelineChart implements TimelineChartInterface {
   public onMouseOver(svg: any, data: any, i: number): void {}
   public onMouseOut(svg: any, data: any, i: number): void {}
   public onClick(svg: any, data: any, i: number): void {}
-  public titleOnHover(svg: any): void {}
+  public titleOnHover(svg: any, instance: any): void {}
 
   /**
    * Draw actual data onto the chart!
@@ -238,6 +249,8 @@ class TimelineChart implements TimelineChartInterface {
 
     var gEnter = g.enter().append("g").attr("class", "chart-row").attr("transform", (d, i) => {
       return "translate(0, " + rowHeight * i + ")";
+    }).attr("data-y", (d, i) => {
+      return rowHeight * i;
     });
 
     var blockG = gEnter.selectAll("g").data((d: any, i: number) => {
@@ -248,6 +261,9 @@ class TimelineChart implements TimelineChartInterface {
         return "translate(" + this.xScale(d.starting_time) +  ", 0)";
       })
       .attr("class", "block")
+      .attr("data-x", (d) => {
+        return this.xScale(d.starting_time);
+      })
       .on("mouseover", function (d: any, i: number) {
         that.onMouseOver(this, d, i);
       })
@@ -298,7 +314,7 @@ class TimelineChart implements TimelineChartInterface {
       return !!(d.type.hasOwnProperty("hasLabel") && d.type.hasLabel === true);
     }).append("svg:title");
 
-    this.titleOnHover(titleDesc);
+    this.titleOnHover(titleDesc, this);
 
     blockG.filter((d) => {
       return !!(d.type.hasOwnProperty("hasLabel") && d.type.hasLabel === true);
@@ -359,5 +375,31 @@ class TimelineChart implements TimelineChartInterface {
   public setDate(date: string): void {
     var startTime: string = "00:00:00", endTime: string = "23:59:59";
     this.setBusinessHours(new Date(date + " " + startTime), new Date(date + " " + endTime));
+  }
+
+  /**
+   * Show tooltip of the current hovering object
+   * TODO: offset is using fixed number.
+   * @returns {any}
+   */
+  public showTooltip(currentInstance: any): any {
+    this.tooltip.transition().duration(300).attr("style", () => {
+      var currentRow: any = d3.select(currentInstance).select(function () {
+        return this.parentNode;
+      }).node();
+      var currentY = +d3.select(currentRow).attr("data-y");
+      var halfed: boolean = (currentY - $("." + TimelineChart.scrollableTimelineClass, "#" + this.moduleName).scrollTop()) > ($("#" + this.moduleName).height() / 2);
+      var offset: number = halfed ? 95 : -35;
+
+      return "opacity: 1; left: " + d3.select(currentInstance).attr("data-x") + "px; top: " + (+d3.select(currentRow).attr("data-y") - offset) + "px";
+    });
+    return this.tooltipInner;
+  }
+
+  public hideTooltip(): any {
+    this.tooltip.attr("style", function () {
+      return "opacity: 0;";
+    });
+    return this.tooltipInner;
   }
 }

@@ -17,15 +17,35 @@ interface TimelineGroupInterface {
  * Represent scheduler group part
  */
 class TimelineGroup implements TimelineGroupInterface {
-  protected aDimension: Dimension; // Group's dimension
-  protected gParent: any;          // The root element
-  protected moduleName: string;    // Stem of target
-  protected aData: any;            // Data
-  public domInstance: any = null;  // DOM root element
-  public svgInstance: any = null;  // SVG root element
+  // Group's dimension
+  protected aDimension: Dimension;
+
+  // The root element
+  protected gParent: any;
+
+  // Stem name of target
+  protected moduleName: string;
+
+  // Data sample
+  protected aData: any;
+
+  // DOM root element
+  public domInstance: any = null;
+
+  // SVG root element
+  public svgInstance: any = null;
+
+  // Row's height, default to 21
   protected rowHeight: number = 21;
+
+  // Left padding of text
   public static leftPadding: number = 5;
-  protected aHeight: number = 0;      // Overall height
+
+  // Overall height
+  protected aHeight: number = 0;
+
+  // Text width, used to calcalate truncate position
+  public textFactorBase: number = 9;
 
   public constructor(dimension: Dimension) {
     if (!dimension) {
@@ -51,6 +71,12 @@ class TimelineGroup implements TimelineGroupInterface {
     return this.rowHeight;
   }
 
+  /**
+   * Initialize the base dom and svg elements.
+   * @param moduleName
+   * @param gParent
+   * @param data
+   */
   public init(moduleName: string, gParent: any, data: any): void {
     this.gParent = gParent;
     this.moduleName = moduleName;
@@ -74,6 +100,10 @@ class TimelineGroup implements TimelineGroupInterface {
     this.svgInstance = svgInstance;
   }
 
+  /**
+   * Draw the data out based on given data.
+   * @param data
+   */
   public drawData(data?: any) {
     // Allow data to override original value.
     if (!data) {
@@ -97,6 +127,10 @@ class TimelineGroup implements TimelineGroupInterface {
     ;
     gEnter.append("text")
       .text((d: any) => {
+        var factor: number = this.getTextFactor(d[0].worker);
+        if (d[0].worker.length > factor) {
+          return d[0].worker.substring(0, factor) + "...";
+        }
         return d[0].worker;
       })
       .attr("dominant-baseline", "central")
@@ -110,11 +144,37 @@ class TimelineGroup implements TimelineGroupInterface {
     ;
   }
 
+  /**
+   * Get factor of a text string
+   * @param text
+   * @returns {number}
+   */
+  public getTextFactor(text: string): number {
+    var factor: number;
+    factor = <number>this.dimension().width() / this.textFactorBase;
+    if (TimelineGroup.containsNonLatinCodepoints(text)) {
+      factor /= 2;
+    }
+
+    return factor;
+  }
+
   public clearNodes(): void {
     this.svgInstance.selectAll("g").remove();
   }
 
   public setData(data: any): void {
     this.aData = data;
+  }
+
+  /**
+   * Test if a string contains non-latin characters
+   * Reference:
+   *   http://stackoverflow.com/questions/147824/how-to-find-whether-a-particular-string-has-unicode-characters-esp-double-byte
+   * @param text
+   * @returns {boolean}
+   */
+  public static containsNonLatinCodepoints(text: string): boolean {
+    return /[^\u0000-\u00ff]/.test(text);
   }
 }
