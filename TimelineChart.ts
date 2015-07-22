@@ -1,5 +1,6 @@
 ///<reference path="DefinitelyTyped/d3/d3.d.ts" />
 ///<reference path="DefinitelyTyped/underscore/underscore.d.ts" />
+///<reference path="DefinitelyTyped/jquery/jquery.d.ts" />
 ///<reference path="Dimension.ts" />
 ///<reference path="TimelineGroup.ts" />
 
@@ -19,6 +20,8 @@ interface TimelineChartInterface {
   updateXAxis(): any;
   drawTimeline(): void;
   clearTimeline(): void;
+  showTooltip(currentInstance: any): any;
+  hideTooltip(): any;
 }
 
 
@@ -72,6 +75,7 @@ class TimelineChart implements TimelineChartInterface {
 
   // Tooltip
   public tooltip: any;
+  public tooltipInner: any;
 
   /**
    * Constructor
@@ -170,7 +174,8 @@ class TimelineChart implements TimelineChartInterface {
     chartSvg.append("g").attr("class", "grid").attr("transform", "translate(0," + theoreticalWidth + ")").call(xGrid);
 
     // Tooltip
-    this.tooltip = this.gParent.append("div").attr("class", "tooltip").style("opacity", 0);
+    this.tooltip = chartScrollableDom.append("div").attr("class", "tooltip").style("opacity", 0);
+    this.tooltipInner = this.tooltip.append("foreignObject").append("div").attr("class", "inner");
 
     this.chartModuleDom = chartModuleDom;
     this.chartSvg = chartSvg;
@@ -244,6 +249,8 @@ class TimelineChart implements TimelineChartInterface {
 
     var gEnter = g.enter().append("g").attr("class", "chart-row").attr("transform", (d, i) => {
       return "translate(0, " + rowHeight * i + ")";
+    }).attr("data-y", (d, i) => {
+      return rowHeight * i;
     });
 
     var blockG = gEnter.selectAll("g").data((d: any, i: number) => {
@@ -254,6 +261,9 @@ class TimelineChart implements TimelineChartInterface {
         return "translate(" + this.xScale(d.starting_time) +  ", 0)";
       })
       .attr("class", "block")
+      .attr("data-x", (d) => {
+        return this.xScale(d.starting_time);
+      })
       .on("mouseover", function (d: any, i: number) {
         that.onMouseOver(this, d, i);
       })
@@ -367,10 +377,27 @@ class TimelineChart implements TimelineChartInterface {
     this.setBusinessHours(new Date(date + " " + startTime), new Date(date + " " + endTime));
   }
 
-  public showTooltip(): void {
-    this.tooltip.transition().duration(200)
-      //.style("opacity", .9).style("left", (d3.event.pageX) + "px")
-      //.style("top", (d3.event.pageY - 28) + "px")
-      .html("test");
+  /**
+   * Show tooltip of the current hovering object
+   * TODO: offset is using fixed number.
+   * @returns {any}
+   */
+  public showTooltip(currentInstance: any): any {
+    this.tooltip.transition().duration(300).attr("style", () => {
+      var currentRow: any = d3.select(currentInstance).node().parentNode;
+      var currentY = +d3.select(currentRow).attr("data-y");
+      var halfed: boolean = (currentY - $("." + TimelineChart.scrollableTimelineClass, "#" + this.moduleName).scrollTop()) > ($("#" + this.moduleName).height() / 2);
+      var offset: number = halfed ? 95 : -35;
+
+      return "opacity: 1; left: " + d3.select(currentInstance).attr("data-x") + "px; top: " + (+d3.select(currentRow).attr("data-y") - offset) + "px";
+    });
+    return this.tooltipInner;
+  }
+
+  public hideTooltip(): any {
+    this.tooltip.attr("style", function () {
+      return "opacity: 0;";
+    });
+    return this.tooltipInner;
   }
 }

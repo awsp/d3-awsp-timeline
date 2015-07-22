@@ -145,32 +145,34 @@ var chart = new TimelineChart(new TwoDimensionalShape(800, 400));
 chart.setRowHeight(rowHeight);
 chart.setBusinessHours(new Date("2015-07-14 00:00:00"), new Date("2015-07-15 03:59:59"));
 chart.onMouseOver = function (self, data, i) {
-  if (data.type.id === "work" && ! d3.select(self).classed("selected")) {
-    d3.select(self).select("rect")
-      .transition()
-      .duration(300)
-      .attr({
-        "fill": "#5390E0",
-        "stroke": "#5390E0"
-      })
-    ;
+  if (data.type.id === "work") {
+    if (! d3.select(self).classed("selected")) {
+      d3.select(self).select("rect")
+        .transition()
+        .duration(300)
+        .attr({
+          "fill": "#5390E0",
+          "stroke": "#5390E0"
+        })
+      ;
+    }
   }
 };
 chart.onMouseOut = function (self, data, i) {
-  if (data.type.id === "work" && ! d3.select(self).classed("selected")) {
-    d3.select(self).select("rect")
-      .transition()
-      .duration(150)
-      .attr({
-        "fill": "#4D82CC",
-        "stroke": "#4D82CC"
-      })
-    ;
+  if (data.type.id === "work") {
+    if (! d3.select(self).classed("selected")) {
+      d3.select(self).select("rect")
+        .transition()
+        .duration(150)
+        .attr({
+          "fill": "#4D82CC",
+          "stroke": "#4D82CC"
+        })
+      ;
+    }
   }
 };
 chart.titleOnHover = function (self, instance) {
-  instance.showTooltip();
-
   var label = self.attr("class", "block-label");
   label.append("tspan")
     .text(function (d) {
@@ -182,20 +184,32 @@ chart.labeling = function (data, i) {
   return data.place;
 };
 
-chart.onClick = function (self, data, i) {
+var me;
+chart.onClick = function (instance, data, i) {
   if (data.type.id === "work") {
-    d3.select(self).attr("class", function () {
-      if (d3.select(self).classed("selected")) {
+    // Show its tooltip
+    me = this;
+    this.showTooltip(instance).html(function () {
+      var html = '';
+      html += '<p>' + data.place + '</p>';
+      html += '<p>' + data.starting_time + '</p>';
+      html += '<a href="#" id="close-tooltip">☓</a>'
+      return html;
+    });
+
+    d3.select(instance).attr("class", function () {
+      if (d3.select(instance).classed("selected")) {
         return d3.select(this).attr("class").replace(/selected/, "");
       }
       return d3.select(this).attr("class") + " selected";
     });
-    d3.select(self).select("rect")
+    d3.select(instance).select("rect")
       .transition()
       .duration(150)
     ;
   }
 };
+
 
 
 // Timeline Group
@@ -219,6 +233,11 @@ d3.select("body").on("keydown", function () {
 // Button Controls
 (function ($, scheduler, workers) {
   $(function () {
+    $("body").on("click", "#close-tooltip", function (e) {
+      e.preventDefault();
+      me.hideTooltip();
+    });
+
     $("#clear").on("click", function () {
       scheduler.clear();
     });
