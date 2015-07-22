@@ -168,7 +168,9 @@ chart.onMouseOut = function (self, data, i) {
     ;
   }
 };
-chart.titleOnHover = function (self) {
+chart.titleOnHover = function (self, instance) {
+  instance.showTooltip();
+
   var label = self.attr("class", "block-label");
   label.append("tspan")
     .text(function (d) {

@@ -12,7 +12,7 @@ interface TimelineChartInterface {
   setBusinessHours(start: Date, end: Date): void;
   onMouseOver(svg: any, data: any, i: number): void;
   onMouseOut(svg: any, data: any, i: number): void;
-  titleOnHover(svg: any): void;
+  titleOnHover(svg: any, instance: any): void;
   clearAll(): void;
   clearNodes(): void;
   setData(data: any): void;
@@ -69,6 +69,9 @@ class TimelineChart implements TimelineChartInterface {
 
   // X Axis Format
   public axisFormat: string = "%I:%M";
+
+  // Tooltip
+  public tooltip: any;
 
   /**
    * Constructor
@@ -166,6 +169,9 @@ class TimelineChart implements TimelineChartInterface {
     var xGrid = d3.svg.axis().scale(xGridScale).orient("bottom").ticks(ticks).tickFormat("").tickSize(-theoreticalWidth, 0);
     chartSvg.append("g").attr("class", "grid").attr("transform", "translate(0," + theoreticalWidth + ")").call(xGrid);
 
+    // Tooltip
+    this.tooltip = this.gParent.append("div").attr("class", "tooltip").style("opacity", 0);
+
     this.chartModuleDom = chartModuleDom;
     this.chartSvg = chartSvg;
   }
@@ -187,7 +193,7 @@ class TimelineChart implements TimelineChartInterface {
   public onMouseOver(svg: any, data: any, i: number): void {}
   public onMouseOut(svg: any, data: any, i: number): void {}
   public onClick(svg: any, data: any, i: number): void {}
-  public titleOnHover(svg: any): void {}
+  public titleOnHover(svg: any, instance: any): void {}
 
   /**
    * Draw actual data onto the chart!
@@ -298,7 +304,7 @@ class TimelineChart implements TimelineChartInterface {
       return !!(d.type.hasOwnProperty("hasLabel") && d.type.hasLabel === true);
     }).append("svg:title");
 
-    this.titleOnHover(titleDesc);
+    this.titleOnHover(titleDesc, this);
 
     blockG.filter((d) => {
       return !!(d.type.hasOwnProperty("hasLabel") && d.type.hasLabel === true);
@@ -359,5 +365,12 @@ class TimelineChart implements TimelineChartInterface {
   public setDate(date: string): void {
     var startTime: string = "00:00:00", endTime: string = "23:59:59";
     this.setBusinessHours(new Date(date + " " + startTime), new Date(date + " " + endTime));
+  }
+
+  public showTooltip(): void {
+    this.tooltip.transition().duration(200)
+      //.style("opacity", .9).style("left", (d3.event.pageX) + "px")
+      //.style("top", (d3.event.pageY - 28) + "px")
+      .html("test");
   }
 }

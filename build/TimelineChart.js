@@ -95,6 +95,8 @@ var TimelineChart = (function () {
         var xGridScale = d3.scale.linear().domain([0, theoreticalWidth]).range([0, theoreticalWidth]);
         var xGrid = d3.svg.axis().scale(xGridScale).orient("bottom").ticks(ticks).tickFormat("").tickSize(-theoreticalWidth, 0);
         chartSvg.append("g").attr("class", "grid").attr("transform", "translate(0," + theoreticalWidth + ")").call(xGrid);
+        // Tooltip
+        this.tooltip = this.gParent.append("div").attr("class", "tooltip").style("opacity", 0);
         this.chartModuleDom = chartModuleDom;
         this.chartSvg = chartSvg;
     };
@@ -116,7 +118,7 @@ var TimelineChart = (function () {
     };
     TimelineChart.prototype.onClick = function (svg, data, i) {
     };
-    TimelineChart.prototype.titleOnHover = function (svg) {
+    TimelineChart.prototype.titleOnHover = function (svg, instance) {
     };
     /**
      * Draw actual data onto the chart!
@@ -196,7 +198,7 @@ var TimelineChart = (function () {
         var titleDesc = blockG.filter(function (d) {
             return !!(d.type.hasOwnProperty("hasLabel") && d.type.hasLabel === true);
         }).append("svg:title");
-        this.titleOnHover(titleDesc);
+        this.titleOnHover(titleDesc, this);
         blockG.filter(function (d) {
             return !!(d.type.hasOwnProperty("hasLabel") && d.type.hasLabel === true);
         }).append("text").text(that.labeling).attr("dx", function (d) {
@@ -243,6 +245,9 @@ var TimelineChart = (function () {
     TimelineChart.prototype.setDate = function (date) {
         var startTime = "00:00:00", endTime = "23:59:59";
         this.setBusinessHours(new Date(date + " " + startTime), new Date(date + " " + endTime));
+    };
+    TimelineChart.prototype.showTooltip = function () {
+        this.tooltip.transition().duration(200).html("test");
     };
     // Timeline CSS Class Name, used to do some jQuery stuff.
     TimelineChart.scrollableTimelineClass = "timeline-scrollable";
