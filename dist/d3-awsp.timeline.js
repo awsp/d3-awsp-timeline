@@ -201,6 +201,7 @@ var TimelineChart = (function () {
         this.chartEnd = null;
         // X Axis Format
         this.axisFormat = "%I:%M";
+        this.tooltipClass = "tooltip";
         if (!dimension) {
             throw new Error("Dimension is not set. ");
         }
@@ -278,7 +279,7 @@ var TimelineChart = (function () {
         var xGrid = d3.svg.axis().scale(xGridScale).orient("bottom").ticks(ticks).tickFormat("").tickSize(-theoreticalWidth, 0);
         chartSvg.append("g").attr("class", "grid").attr("transform", "translate(0," + theoreticalWidth + ")").call(xGrid);
         // Tooltip
-        this.tooltip = chartScrollableDom.append("div").attr("class", "tooltip").style("opacity", 0);
+        this.tooltip = chartScrollableDom.append("div").attr("class", this.tooltipClass).style("opacity", 0);
         this.tooltipInner = this.tooltip.append("foreignObject").append("div").attr("class", "inner");
         this.chartModuleDom = chartModuleDom;
         this.chartSvg = chartSvg;
@@ -397,10 +398,14 @@ var TimelineChart = (function () {
                 return (rowHeight - d.type.height) / 2;
             }
         });
+        // Title Box [Optional]
+        // Insert a title into svg element to allow A tag-liked description box.
+        // Override to make custom title box.
         var titleDesc = blockG.filter(function (d) {
             return !!(d.type.hasOwnProperty("hasLabel") && d.type.hasLabel === true);
         }).append("svg:title");
         this.titleOnHover(titleDesc, this);
+        // Block Labeling
         blockG.filter(function (d) {
             return !!(d.type.hasOwnProperty("hasLabel") && d.type.hasLabel === true);
         }).append("text")
@@ -454,8 +459,20 @@ var TimelineChart = (function () {
         this.setBusinessHours(new Date(date + " " + startTime), new Date(date + " " + endTime));
     };
     /**
+     * Get chart svg height.
+     * If total # of rows don't make up the height of defined one, use the actual svg height,
+     * otherwise use the defined one.
+     * @returns {number}
+     */
+    TimelineChart.prototype.getChartSVGHeight = function () {
+        var moduleHeight = +$("#" + this.moduleName).height();
+        var svgHeight = +this.chartSvg.attr("height");
+        return moduleHeight < svgHeight ? moduleHeight : svgHeight;
+    };
+    /**
      * Show tooltip of the current hovering object
-     * TODO: offset is using fixed number.
+     * Usage:
+     *   instance.showTooltip(currentInstance).html(...) <- insert code
      * @returns {any}
      */
     TimelineChart.prototype.showTooltip = function (currentInstance) {
@@ -464,13 +481,22 @@ var TimelineChart = (function () {
             var currentRow = d3.select(currentInstance).select(function () {
                 return this.parentNode;
             }).node();
+            var currentHeight = _this.getChartSVGHeight();
             var currentY = +d3.select(currentRow).attr("data-y");
-            var halfed = (currentY - $("." + TimelineChart.scrollableTimelineClass, "#" + _this.moduleName).scrollTop()) > ($("#" + _this.moduleName).height() / 2);
-            var offset = halfed ? 95 : -35;
-            return "opacity: 1; left: " + d3.select(currentInstance).attr("data-x") + "px; top: " + (+d3.select(currentRow).attr("data-y") - offset) + "px";
+            var halfed = (currentY - $("." + TimelineChart.scrollableTimelineClass, "#" + _this.moduleName).scrollTop()) > (currentHeight / 2);
+            // Calculate relative position of tooltip box
+            var toolTipDom = _this.tooltip.node().getBoundingClientRect();
+            var halfRowHeight = _this.rowHeight / 2;
+            var halfBarHeight = (+d3.select(currentInstance).select("rect").attr("height")) / 2;
+            var offset = halfed ? halfRowHeight - halfBarHeight - toolTipDom.height : halfRowHeight + halfBarHeight;
+            return "opacity: 1; left: " + d3.select(currentInstance).attr("data-x") + "px; top: " + (+d3.select(currentRow).attr("data-y") + offset) + "px";
         });
         return this.tooltipInner;
     };
+    /**
+     * Hiding tooltip
+     * @returns {any}
+     */
     TimelineChart.prototype.hideTooltip = function () {
         this.tooltip.attr("style", function () {
             return "opacity: 0;";

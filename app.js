@@ -1,5 +1,5 @@
 // Configuration
-var rowHeight = 42;
+var rowHeight = 50;
 
 // Types of Bar
 var types = [
@@ -192,7 +192,7 @@ chart.onClick = function (instance, data, i) {
     this.showTooltip(instance).html(function () {
       var html = '';
       html += '<p>' + data.place + '</p>';
-      html += '<p>' + data.starting_time + '</p>';
+      html += '<p>' + new Date(data.starting_time).toString() + '</p>';
       html += '<a href="#" id="close-tooltip">☓</a>'
       return html;
     });

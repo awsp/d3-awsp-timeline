@@ -13,6 +13,7 @@ interface TimelineChartInterface {
   setBusinessHours(start: Date, end: Date): void;
   onMouseOver(svg: any, data: any, i: number): void;
   onMouseOut(svg: any, data: any, i: number): void;
+  onClick(svg: any, data: any, i: number): void;
   titleOnHover(svg: any, instance: any): void;
   clearAll(): void;
   clearNodes(): void;
@@ -76,6 +77,7 @@ class TimelineChart implements TimelineChartInterface {
   // Tooltip
   public tooltip: any;
   public tooltipInner: any;
+  public tooltipClass = "tooltip";
 
   /**
    * Constructor
@@ -174,7 +176,7 @@ class TimelineChart implements TimelineChartInterface {
     chartSvg.append("g").attr("class", "grid").attr("transform", "translate(0," + theoreticalWidth + ")").call(xGrid);
 
     // Tooltip
-    this.tooltip = chartScrollableDom.append("div").attr("class", "tooltip").style("opacity", 0);
+    this.tooltip = chartScrollableDom.append("div").attr("class", this.tooltipClass).style("opacity", 0);
     this.tooltipInner = this.tooltip.append("foreignObject").append("div").attr("class", "inner");
 
     this.chartModuleDom = chartModuleDom;
@@ -310,12 +312,15 @@ class TimelineChart implements TimelineChartInterface {
       })
     ;
 
+    // Title Box [Optional]
+    // Insert a title into svg element to allow A tag-liked description box.
+    // Override to make custom title box.
     var titleDesc = blockG.filter((d) => {
       return !!(d.type.hasOwnProperty("hasLabel") && d.type.hasLabel === true);
     }).append("svg:title");
-
     this.titleOnHover(titleDesc, this);
 
+    // Block Labeling
     blockG.filter((d) => {
       return !!(d.type.hasOwnProperty("hasLabel") && d.type.hasLabel === true);
     }).append("text")
@@ -378,8 +383,21 @@ class TimelineChart implements TimelineChartInterface {
   }
 
   /**
+   * Get chart svg height.
+   * If total # of rows don't make up the height of defined one, use the actual svg height,
+   * otherwise use the defined one. 
+   * @returns {number}
+   */
+  public getChartSVGHeight(): number {
+    var moduleHeight: number = +$("#" + this.moduleName).height();
+    var svgHeight: number = +this.chartSvg.attr("height");
+    return moduleHeight < svgHeight ? moduleHeight : svgHeight;
+  }
+
+  /**
    * Show tooltip of the current hovering object
-   * TODO: offset is using fixed number.
+   * Usage:
+   *   instance.showTooltip(currentInstance).html(...) <- insert code
    * @returns {any}
    */
   public showTooltip(currentInstance: any): any {
@@ -387,15 +405,26 @@ class TimelineChart implements TimelineChartInterface {
       var currentRow: any = d3.select(currentInstance).select(function () {
         return this.parentNode;
       }).node();
-      var currentY = +d3.select(currentRow).attr("data-y");
-      var halfed: boolean = (currentY - $("." + TimelineChart.scrollableTimelineClass, "#" + this.moduleName).scrollTop()) > ($("#" + this.moduleName).height() / 2);
-      var offset: number = halfed ? 95 : -35;
 
-      return "opacity: 1; left: " + d3.select(currentInstance).attr("data-x") + "px; top: " + (+d3.select(currentRow).attr("data-y") - offset) + "px";
+      var currentHeight: number = this.getChartSVGHeight();
+      var currentY = +d3.select(currentRow).attr("data-y");
+      var halfed: boolean = (currentY - $("." + TimelineChart.scrollableTimelineClass, "#" + this.moduleName).scrollTop()) > (currentHeight / 2);
+
+      // Calculate relative position of tooltip box
+      var toolTipDom = this.tooltip.node().getBoundingClientRect();
+      var halfRowHeight: number = this.rowHeight / 2;
+      var halfBarHeight: number = (+d3.select(currentInstance).select("rect").attr("height")) / 2;
+      var offset: number = halfed ? halfRowHeight - halfBarHeight - toolTipDom.height : halfRowHeight + halfBarHeight;
+
+      return "opacity: 1; left: " + d3.select(currentInstance).attr("data-x") + "px; top: " + (+d3.select(currentRow).attr("data-y") + offset) + "px";
     });
     return this.tooltipInner;
   }
 
+  /**
+   * Hiding tooltip
+   * @returns {any}
+   */
   public hideTooltip(): any {
     this.tooltip.attr("style", function () {
       return "opacity: 0;";
