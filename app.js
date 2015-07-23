@@ -1,5 +1,5 @@
 // Configuration
-var rowHeight = 42;
+var rowHeight = 60;
 
 // Types of Bar
 // TODO: create a class for type, and type collection

@@ -120,12 +120,12 @@ body {
   position: relative;
 }
 .scheduler-module .chart-module .selected rect {
-  fill: #ff0000;
-  stroke: #ff0000;
+  fill: purple;
+  stroke: purple;
 }
 .scheduler-module .chart-module .overlapping {
-  fill: #ff0000;
-  stroke: #ff0000;
+  fill: #ff4f78;
+  stroke: #ff4f78;
 }
 .even {
   fill: #ffffff;
