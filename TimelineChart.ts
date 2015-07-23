@@ -7,7 +7,12 @@
 interface TimelineChartInterface {
   init(moduleName: string, gParent: any, data: any, width: d3.Primitive): void;
   setRowHeight(height: number): void;
-  drawData(): void;
+
+  draw(): void;
+  drawLabels(blockG: any): void;
+  drawTimeline(): void;
+  drawBlocks(blockG: any): void;
+
   labeling(d: any, i?: number): any;
   setDate(date: string): void;
   setBusinessHours(start: Date, end: Date): void;
@@ -19,7 +24,7 @@ interface TimelineChartInterface {
   clearNodes(): void;
   setData(data: any): void;
   updateXAxis(): any;
-  drawTimeline(): void;
+
   clearTimeline(): void;
   showTooltip(currentInstance: any): any;
   hideTooltip(): any;
@@ -203,79 +208,45 @@ class TimelineChart implements TimelineChartInterface {
   public titleOnHover(svg: any, instance: any): void {}
 
   /**
-   * Draw actual data onto the chart!
+   * Determine and mark overlaps if type has a property `markOverlap` to true
+   * @param blockG
    */
-  public drawData(): void {
-    // Timeline SVG timeline
-    this.drawTimeline();
+  public determineOverlaps(blockG: any): void {
+    // Hold temporary overlapped blocks
+    var overlapBlockHolder: any = {};
 
-    // Update length
-    this.chartSvg.attr("width", this.chartRange);
+    blockG.filter(function (d) {
+      return d.type.markOverlap;
+    }).select("rect").attr("class", (d, i) => {
+      if (i === 0) {
+        overlapBlockHolder[d.worker] = [];
+      }
+      for (var i in overlapBlockHolder[d.worker]) {
+        var range = overlapBlockHolder[d.worker][i];
+        var start = range.start;
+        var end = range.end;
+        if (d3.max([start, d.starting_time]) <= d3.min([end, d.ending_time])) {
+          // No need to save reference since we have marked the first block that might overlap
+          return d.type.overlapClass;
+        }
+      }
 
-    var that = this;
-    var baseG = this.chartSvg.append("g").attr("transform", "translate(0, 0)").attr("class", "node-chart");
-    var g = baseG.selectAll("g").data(d3.values(this.aData));
-    var rowHeight: number = this.rowHeight;
-
-    var defFilter = baseG.append("defs").append("filter")
-      .attr({
-        x: 0,
-        y: 0,
-        width: "200%",
-        height: "200%",
-        id: "f1"
+      // Save range for later calculation.
+      overlapBlockHolder[d.worker].push({
+        start: d.starting_time,
+        end: d.ending_time,
+        marked: false
       });
-    defFilter.append("feOffset")
-      .attr({
-        result: "offOut",
-        "in": "SourceGraphic",
-        dx: 2,
-        dy: 7
-      })
-    ;
-    defFilter.append("feGaussianBlur")
-      .attr({
-        result: "blurOut",
-        "in": "matrixOut",
-        stdDeviation: 10
-      })
-    ;
-    defFilter.append("feBlend")
-      .attr({
-        "in": "SourceGraphic",
-        in2: "blurOut",
-        mode: "normal"
-      })
-    ;
-
-
-    var gEnter = g.enter().append("g").attr("class", "chart-row").attr("transform", (d, i) => {
-      return "translate(0, " + rowHeight * i + ")";
-    }).attr("data-y", (d, i) => {
-      return rowHeight * i;
+      return '';
     });
+  }
 
-    var blockG = gEnter.selectAll("g").data((d: any, i: number) => {
-      return d;
-    }).enter()
-      .append("g")
-      .attr("transform", (d) => {
-        return "translate(" + this.xScale(d.starting_time) +  ", 0)";
-      })
-      .attr("class", "block")
-      .attr("data-x", (d) => {
-        return this.xScale(d.starting_time);
-      })
-      .on("mouseover", function (d: any, i: number) {
-        that.onMouseOver(this, d, i);
-      })
-      .on("mouseout", function (d: any, i: number) {
-        that.onMouseOut(this, d, i);
-      })
-      .on("click", function (d: any, i: number) {
-        that.onClick(this, d, i);
-      })
-    ;
+  /**
+   * Draw all blocks on given chart element.
+   * @param blockG
+   */
+  public drawBlocks(blockG: any): void {
+    var rowHeight = this.rowHeight;
 
     blockG.append("rect")
       .attr("fill", (d) => {
@@ -311,20 +282,57 @@ class TimelineChart implements TimelineChartInterface {
         }
       })
     ;
+  }
 
-    // Title Box [Optional]
-    // Insert a title into svg element to allow A tag-liked description box.
-    // Override to make custom title box.
-    var titleDesc = blockG.filter((d) => {
-      return !!(d.type.hasOwnProperty("hasLabel") && d.type.hasLabel === true);
-    }).append("svg:title");
-    this.titleOnHover(titleDesc, this);
+  /**
+   * Append SVG gradient definitions
+   * @param baseG
+   * @returns {any}
+   */
+  public static appendDefinitions(baseG: any): any {
+    // Gradient Definitions
+    var defFilter: any = baseG.append("defs").append("filter")
+      .attr({
+        x: 0,
+        y: 0,
+        width: "200%",
+        height: "200%",
+        id: "f1"
+      });
+    defFilter.append("feOffset")
+      .attr({
+        result: "offOut",
+        "in": "SourceGraphic",
+        dx: 2,
+        dy: 7
+      })
+    ;
+    defFilter.append("feGaussianBlur")
+      .attr({
+        result: "blurOut",
+        "in": "matrixOut",
+        stdDeviation: 10
+      })
+    ;
+    defFilter.append("feBlend")
+      .attr({
+        "in": "SourceGraphic",
+        in2: "blurOut",
+        mode: "normal"
+      })
+    ;
 
-    // Block Labeling
+    return defFilter;
+  }
+
+
+  public drawLabels(blockG: any): void {
+    var rowHeight = this.rowHeight;
+
     blockG.filter((d) => {
       return !!(d.type.hasOwnProperty("hasLabel") && d.type.hasLabel === true);
     }).append("text")
-      .text(that.labeling)
+      .text(this.labeling)
       .attr("dx", (d) => {
         return d.type.hasOwnProperty("round") ? d.type.round + 3 : 3;
       })
@@ -336,6 +344,75 @@ class TimelineChart implements TimelineChartInterface {
       })
       .attr("dominant-baseline", "central")
     ;
+  }
+
+  /**
+   * Draw actual data onto the chart!
+   */
+  public draw(): void {
+    // Timeline SVG timeline
+    this.drawTimeline();
+
+    // Update length
+    this.chartSvg.attr("width", this.chartRange);
+
+    // Save class reference
+    var that = this;
+
+    // Base G
+    var baseG = this.chartSvg.append("g").attr("transform", "translate(0, 0)").attr("class", "node-chart");
+    var g = baseG.selectAll("g").data(d3.values(this.aData));
+
+    // Row Height
+    var rowHeight: number = this.rowHeight;
+
+    // Gradient Definitions
+    TimelineChart.appendDefinitions(baseG);
+
+    var gEnter = g.enter().append("g").attr("class", "chart-row").attr("transform", (d, i) => {
+      return "translate(0, " + rowHeight * i + ")";
+    }).attr("data-y", (d, i) => {
+      return rowHeight * i;
+    });
+
+    var blockG = gEnter.selectAll("g").data((d: any, i: number) => {
+      return d;
+    }).enter()
+      .append("g")
+      .attr("transform", (d) => {
+        return "translate(" + this.xScale(d.starting_time) +  ", 0)";
+      })
+      .attr("class", "block")
+      .attr("data-x", (d) => {
+        return this.xScale(d.starting_time);
+      })
+      .on("mouseover", function (d: any, i: number) {
+        that.onMouseOver(this, d, i);
+      })
+      .on("mouseout", function (d: any, i: number) {
+        that.onMouseOut(this, d, i);
+      })
+      .on("click", function (d: any, i: number) {
+        that.onClick(this, d, i);
+      })
+    ;
+
+    // Draw all blocks
+    this.drawBlocks(blockG);
+
+    // Determine overlapping
+    this.determineOverlaps(blockG);
+
+    // Title Box [Optional]
+    // Insert a title into svg element to allow A tag-liked description box.
+    // Override to make custom title box.
+    var titleDesc = blockG.filter((d) => {
+      return !!(d.type.hasOwnProperty("hasLabel") && d.type.hasLabel === true);
+    }).append("svg:title");
+    this.titleOnHover(titleDesc, this);
+
+    // Blocks Labeling
+    this.drawLabels(blockG);
   }
 
   public clearAll(): void {

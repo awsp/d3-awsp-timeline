@@ -1,6 +1,7 @@
 ///<reference path="DefinitelyTyped/d3/d3.d.ts" />
 ///<reference path="DefinitelyTyped/jquery/jquery.d.ts" />
 ///<reference path="DefinitelyTyped/underscore/underscore.d.ts" />
+///<reference path="DefinitelyTyped/moment/moment.d.ts" />
 ///<reference path="TimelineChart.ts" />
 ///<reference path="TimelineGroup.ts" />
 ///<reference path="Dimension.ts" />
@@ -55,8 +56,6 @@ var TimelineScheduler = (function () {
      * @param groupBy
      * @param order
      * @returns {Dictionary<T[]>|Dictionary<TValue[]>|_.Dictionary<T[]>}
-     *
-     * TODO: sorting worker's name.
      */
     TimelineScheduler.processData = function (data, groupBy, order) {
         if (order === void 0) { order = "asc"; }
@@ -118,7 +117,7 @@ var TimelineScheduler = (function () {
      */
     TimelineScheduler.prototype.render = function () {
         this.grouping.drawData();
-        this.chart.drawData();
+        this.chart.draw();
     };
     TimelineScheduler.scheduleModuleClass = "scheduler-module";
     TimelineScheduler.scheduleInnerClass = "scheduler-inner";

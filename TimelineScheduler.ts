@@ -1,6 +1,7 @@
 ///<reference path="DefinitelyTyped/d3/d3.d.ts" />
 ///<reference path="DefinitelyTyped/jquery/jquery.d.ts" />
 ///<reference path="DefinitelyTyped/underscore/underscore.d.ts" />
+///<reference path="DefinitelyTyped/moment/moment.d.ts" />
 ///<reference path="TimelineChart.ts" />
 ///<reference path="TimelineGroup.ts" />
 ///<reference path="Dimension.ts" />
@@ -80,8 +81,6 @@ class TimelineScheduler {
    * @param groupBy
    * @param order
    * @returns {Dictionary<T[]>|Dictionary<TValue[]>|_.Dictionary<T[]>}
-   *
-   * TODO: sorting worker's name.
    */
   public static processData(data: any, groupBy: string, order: string = "asc"): any {
     var groupedData: any = _.groupBy(data, groupBy), sortedPersons: any, persons: any;
@@ -96,6 +95,7 @@ class TimelineScheduler {
         }
         return -d.type.zIndex;
       });
+
       groupedData[i] = sortedPersons;
     }
 
@@ -154,7 +154,7 @@ class TimelineScheduler {
    */
   public render(): void {
     this.grouping.drawData();
-    this.chart.drawData();
+    this.chart.draw();
   }
 
 }

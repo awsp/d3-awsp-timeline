@@ -1,7 +1,7 @@
 /* Variables */
 @tooltipBorderColor: #5f5f5f;
 @borderColor: #ccc;
-@selectedBlockColor: #f00;
+@selectedBlockColor: #ff4f78;
 @rowEvenColor: #ffffff;
 @rowOddColor: #efefef;
 @tooltipBackground: rgba(0, 0, 0, 0.6);
@@ -106,6 +106,10 @@ body {
       .relative;
     }
     .selected rect {
+      fill: purple;
+      stroke: purple;
+    }
+    .overlapping {
       fill: @selectedBlockColor;
       stroke: @selectedBlockColor;
     }
