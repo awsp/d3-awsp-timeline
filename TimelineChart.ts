@@ -383,6 +383,10 @@ class TimelineChart implements TimelineChartInterface {
         return "translate(" + this.xScale(d.starting_time) +  ", 0)";
       })
       .attr("class", "block")
+      .attr("id", function (d, i) {
+        var currentY: number = +d3.select(this.parentNode).attr("data-y");
+        return d.type.id + "-" + currentY + "-" + i;
+      })  
       .attr("data-x", (d) => {
         return this.xScale(d.starting_time);
       })

@@ -258,7 +258,10 @@ var TimelineChart = (function () {
             return d;
         }).enter().append("g").attr("transform", function (d) {
             return "translate(" + _this.xScale(d.starting_time) + ", 0)";
-        }).attr("class", "block").attr("data-x", function (d) {
+        }).attr("class", "block").attr("id", function (d, i) {
+            var currentY = +d3.select(this.parentNode).attr("data-y");
+            return d.type.id + "-" + currentY + "-" + i;
+        }).attr("data-x", function (d) {
             return _this.xScale(d.starting_time);
         }).on("mouseover", function (d, i) {
             that.onMouseOver(this, d, i);
