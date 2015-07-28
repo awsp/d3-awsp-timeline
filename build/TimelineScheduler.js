@@ -113,6 +113,7 @@ var TimelineScheduler = (function () {
     TimelineScheduler.prototype.clear = function () {
         this.chart.clearNodes();
         this.chart.clearTimeline();
+        this.chart.clearGrid();
         this.grouping.clearNodes();
     };
     /**

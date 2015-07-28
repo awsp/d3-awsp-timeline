@@ -6,26 +6,32 @@
 
 interface TimelineChartInterface {
   init(moduleName: string, gParent: any, data: any, width: d3.Primitive): void;
-  setRowHeight(height: number): void;
 
   draw(): void;
   drawLabels(blockG: any): void;
-  drawTimeline(): void;
+  drawTimeline(timelineSvg?: any): void;
   drawBlocks(blockG: any): void;
+  drawGrid(chartSvg?: any): void;
 
-  labeling(d: any, i?: number): any;
   setDate(date: string): void;
   setBusinessHours(start: Date, end: Date): void;
+
+  labeling(d: any, i?: number): any;
   onMouseOver(svg: any, data: any, i: number): void;
   onMouseOut(svg: any, data: any, i: number): void;
   onClick(svg: any, data: any, i: number): void;
   titleOnHover(svg: any, instance: any): void;
-  clearAll(): void;
-  clearNodes(): void;
   setData(data: any): void;
+  setXAxisFormat(format: string): void;
+  setRowHeight(height: number): void;
+
   updateXAxis(): any;
 
+  clearAll(): void;
+  clearNodes(): void;
   clearTimeline(): void;
+  clearGrid(): void;
+
   showTooltip(currentInstance: any): any;
   hideTooltip(): any;
 }
@@ -55,7 +61,7 @@ class TimelineChart implements TimelineChartInterface {
 
   // Storing Current Height
   protected aHeight: number;
-  
+
   // Storing data
   protected aData: any;
 
@@ -77,7 +83,7 @@ class TimelineChart implements TimelineChartInterface {
   protected chartEnd: Date = null;
 
   // X Axis Format
-  public axisFormat: string = "%I:%M";
+  public axisFormat: string = "%H:%M";
 
   // Tooltip
   public tooltip: any;
@@ -121,7 +127,14 @@ class TimelineChart implements TimelineChartInterface {
     this.aData = data;
   }
 
-  public drawTimeline(): void {
+  public setXAxisFormat(format: string): void {
+    this.axisFormat = format;
+  }
+
+  public drawTimeline(timelineSvg?: any): void {
+    if (!timelineSvg) {
+      timelineSvg = this.timelineSvg;
+    }
     var xScale = this.xScale = this.updateXAxis();
     var xAxis = d3.svg.axis()
       .scale(xScale)
@@ -129,7 +142,17 @@ class TimelineChart implements TimelineChartInterface {
       .ticks(d3.time.minutes, 30)
       .tickSize(6)
       .tickFormat(d3.time.format(this.axisFormat));
-    this.timelineSvg.attr("width", this.chartRange).attr("class", "changed").append("g").attr("class", "axis").attr("transform", "translate(0, " + (TimelineChart.timelineHeight - 1) + ")").call(xAxis);
+    timelineSvg.attr("width", this.chartRange).attr("class", "changed").append("g").attr("class", "axis").attr("transform", "translate(0, " + (TimelineChart.timelineHeight - 1) + ")").call(xAxis);
+  }
+
+  public drawGrid(chartSvg?: any): void {
+    if (!chartSvg) {
+      chartSvg = this.chartSvg;
+    }
+    var ticks: number = 24 * 2;
+    var xGridScale = d3.scale.linear().domain([0, this.chartRange]).range([0, this.chartRange]);
+    var xGrid = d3.svg.axis().scale(xGridScale).orient("bottom").ticks(ticks).tickFormat("").tickSize(-this.chartRange, 0);
+    chartSvg.append("g").attr("class", "grid").attr("transform", "translate(0," + this.chartRange + ")").call(xGrid);
   }
 
   /**
@@ -142,7 +165,7 @@ class TimelineChart implements TimelineChartInterface {
   public init(moduleName: string, gParent: any, data: any, marginLeft: number): void {
     this.gParent = gParent;
     this.moduleName = moduleName;
-    this.aData = data; 
+    this.aData = data;
     var theoreticalWidth: number = this.chartRange;
     var theoreticalHeight: number = this.aHeight = Object.keys(data).length * this.rowHeight;
 
@@ -174,12 +197,6 @@ class TimelineChart implements TimelineChartInterface {
     var chartSvg = chartScrollableDom.append("svg");
     chartSvg.attr("width", theoreticalWidth).attr("height", theoreticalHeight);
 
-    // Timeline Chart Grid
-    var ticks: number = 24 * 2;
-    var xGridScale = d3.scale.linear().domain([0, theoreticalWidth]).range([0, theoreticalWidth]);
-    var xGrid = d3.svg.axis().scale(xGridScale).orient("bottom").ticks(ticks).tickFormat("").tickSize(-theoreticalWidth, 0);
-    chartSvg.append("g").attr("class", "grid").attr("transform", "translate(0," + theoreticalWidth + ")").call(xGrid);
-
     // Tooltip
     this.tooltip = chartScrollableDom.append("div").attr("class", this.tooltipClass).style("opacity", 0);
     this.tooltipInner = this.tooltip.append("foreignObject").append("div").attr("class", "inner");
@@ -202,10 +219,17 @@ class TimelineChart implements TimelineChartInterface {
     return this.xScale;
   }
 
-  public onMouseOver(svg: any, data: any, i: number): void {}
-  public onMouseOut(svg: any, data: any, i: number): void {}
-  public onClick(svg: any, data: any, i: number): void {}
-  public titleOnHover(svg: any, instance: any): void {}
+  public onMouseOver(svg: any, data: any, i: number): void {
+  }
+
+  public onMouseOut(svg: any, data: any, i: number): void {
+  }
+
+  public onClick(svg: any, data: any, i: number): void {
+  }
+
+  public titleOnHover(svg: any, instance: any): void {
+  }
 
   /**
    * Determine and mark overlaps if type has a property `markOverlap` to true
@@ -356,6 +380,9 @@ class TimelineChart implements TimelineChartInterface {
     // Update length
     this.chartSvg.attr("width", this.chartRange);
 
+    // Timeline Grid
+    this.drawGrid();
+
     // Save class reference
     var that = this;
 
@@ -376,30 +403,30 @@ class TimelineChart implements TimelineChartInterface {
     });
 
     var blockG = gEnter.selectAll("g").data((d: any, i: number) => {
-      return d;
-    }).enter()
-      .append("g")
-      .attr("transform", (d) => {
-        return "translate(" + this.xScale(d.starting_time) +  ", 0)";
-      })
-      .attr("class", "block")
-      .attr("id", function (d, i) {
-        var currentY: number = +d3.select(this.parentNode).attr("data-y");
-        return d.type.id + "-" + currentY + "-" + i;
-      })  
-      .attr("data-x", (d) => {
-        return this.xScale(d.starting_time);
-      })
-      .on("mouseover", function (d: any, i: number) {
-        that.onMouseOver(this, d, i);
-      })
-      .on("mouseout", function (d: any, i: number) {
-        that.onMouseOut(this, d, i);
-      })
-      .on("click", function (d: any, i: number) {
-        that.onClick(this, d, i);
-      })
-    ;
+        return d;
+      }).enter()
+        .append("g")
+        .attr("transform", (d) => {
+          return "translate(" + this.xScale(d.starting_time) + ", 0)";
+        })
+        .attr("class", "block")
+        .attr("id", function (d, i) {
+          var currentY: number = +d3.select(this.parentNode).attr("data-y");
+          return d.type.id + "-" + currentY + "-" + i;
+        })
+        .attr("data-x", (d) => {
+          return this.xScale(d.starting_time);
+        })
+        .on("mouseover", function (d: any, i: number) {
+          that.onMouseOver(this, d, i);
+        })
+        .on("mouseout", function (d: any, i: number) {
+          that.onMouseOut(this, d, i);
+        })
+        .on("click", function (d: any, i: number) {
+          that.onClick(this, d, i);
+        })
+      ;
 
     // Draw all blocks
     this.drawBlocks(blockG);
@@ -429,6 +456,10 @@ class TimelineChart implements TimelineChartInterface {
 
   public clearTimeline(): void {
     this.timelineSvg.selectAll("g").remove();
+  }
+
+  public clearGrid(): void {
+    this.chartSvg.selectAll("g.grid").remove();
   }
 
   /**
@@ -466,7 +497,7 @@ class TimelineChart implements TimelineChartInterface {
   /**
    * Get chart svg height.
    * If total # of rows don't make up the height of defined one, use the actual svg height,
-   * otherwise use the defined one. 
+   * otherwise use the defined one.
    * @returns {number}
    */
   public getChartSVGHeight(): number {

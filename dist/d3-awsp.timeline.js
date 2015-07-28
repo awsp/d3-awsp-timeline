@@ -200,7 +200,7 @@ var TimelineChart = (function () {
         this.chartStart = null;
         this.chartEnd = null;
         // X Axis Format
-        this.axisFormat = "%I:%M";
+        this.axisFormat = "%H:%M";
         this.tooltipClass = "tooltip";
         if (!dimension) {
             throw new Error("Dimension is not set. ");
@@ -228,7 +228,13 @@ var TimelineChart = (function () {
     TimelineChart.prototype.setData = function (data) {
         this.aData = data;
     };
-    TimelineChart.prototype.drawTimeline = function () {
+    TimelineChart.prototype.setXAxisFormat = function (format) {
+        this.axisFormat = format;
+    };
+    TimelineChart.prototype.drawTimeline = function (timelineSvg) {
+        if (!timelineSvg) {
+            timelineSvg = this.timelineSvg;
+        }
         var xScale = this.xScale = this.updateXAxis();
         var xAxis = d3.svg.axis()
             .scale(xScale)
@@ -236,7 +242,16 @@ var TimelineChart = (function () {
             .ticks(d3.time.minutes, 30)
             .tickSize(6)
             .tickFormat(d3.time.format(this.axisFormat));
-        this.timelineSvg.attr("width", this.chartRange).attr("class", "changed").append("g").attr("class", "axis").attr("transform", "translate(0, " + (TimelineChart.timelineHeight - 1) + ")").call(xAxis);
+        timelineSvg.attr("width", this.chartRange).attr("class", "changed").append("g").attr("class", "axis").attr("transform", "translate(0, " + (TimelineChart.timelineHeight - 1) + ")").call(xAxis);
+    };
+    TimelineChart.prototype.drawGrid = function (chartSvg) {
+        if (!chartSvg) {
+            chartSvg = this.chartSvg;
+        }
+        var ticks = 24 * 2;
+        var xGridScale = d3.scale.linear().domain([0, this.chartRange]).range([0, this.chartRange]);
+        var xGrid = d3.svg.axis().scale(xGridScale).orient("bottom").ticks(ticks).tickFormat("").tickSize(-this.chartRange, 0);
+        chartSvg.append("g").attr("class", "grid").attr("transform", "translate(0," + this.chartRange + ")").call(xGrid);
     };
     /**
      * Set up chart, timeline
@@ -273,11 +288,6 @@ var TimelineChart = (function () {
         // Timeline Chart SVG
         var chartSvg = chartScrollableDom.append("svg");
         chartSvg.attr("width", theoreticalWidth).attr("height", theoreticalHeight);
-        // Timeline Chart Grid
-        var ticks = 24 * 2;
-        var xGridScale = d3.scale.linear().domain([0, theoreticalWidth]).range([0, theoreticalWidth]);
-        var xGrid = d3.svg.axis().scale(xGridScale).orient("bottom").ticks(ticks).tickFormat("").tickSize(-theoreticalWidth, 0);
-        chartSvg.append("g").attr("class", "grid").attr("transform", "translate(0," + theoreticalWidth + ")").call(xGrid);
         // Tooltip
         this.tooltip = chartScrollableDom.append("div").attr("class", this.tooltipClass).style("opacity", 0);
         this.tooltipInner = this.tooltip.append("foreignObject").append("div").attr("class", "inner");
@@ -296,10 +306,14 @@ var TimelineChart = (function () {
         this.xScale = d3.time.scale().domain([start, end]).range([0, this.chartRange]);
         return this.xScale;
     };
-    TimelineChart.prototype.onMouseOver = function (svg, data, i) { };
-    TimelineChart.prototype.onMouseOut = function (svg, data, i) { };
-    TimelineChart.prototype.onClick = function (svg, data, i) { };
-    TimelineChart.prototype.titleOnHover = function (svg, instance) { };
+    TimelineChart.prototype.onMouseOver = function (svg, data, i) {
+    };
+    TimelineChart.prototype.onMouseOut = function (svg, data, i) {
+    };
+    TimelineChart.prototype.onClick = function (svg, data, i) {
+    };
+    TimelineChart.prototype.titleOnHover = function (svg, instance) {
+    };
     /**
      * Determine and mark overlaps if type has a property `markOverlap` to true
      * @param blockG
@@ -434,6 +448,8 @@ var TimelineChart = (function () {
         this.drawTimeline();
         // Update length
         this.chartSvg.attr("width", this.chartRange);
+        // Timeline Grid
+        this.drawGrid();
         // Save class reference
         var that = this;
         // Base G
@@ -494,6 +510,9 @@ var TimelineChart = (function () {
     };
     TimelineChart.prototype.clearTimeline = function () {
         this.timelineSvg.selectAll("g").remove();
+    };
+    TimelineChart.prototype.clearGrid = function () {
+        this.chartSvg.selectAll("g.grid").remove();
     };
     /**
      * Default data-binding on labels
@@ -691,6 +710,7 @@ var TimelineScheduler = (function () {
     TimelineScheduler.prototype.clear = function () {
         this.chart.clearNodes();
         this.chart.clearTimeline();
+        this.chart.clearGrid();
         this.grouping.clearNodes();
     };
     /**
