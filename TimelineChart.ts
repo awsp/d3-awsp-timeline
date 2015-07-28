@@ -225,7 +225,7 @@ class TimelineChart implements TimelineChartInterface {
         var range = overlapBlockHolder[d.worker][i];
         var start = range.start;
         var end = range.end;
-        if (d3.max([start, d.starting_time]) <= d3.min([end, d.ending_time])) {
+        if (d3.max([start, d.starting_time]) < d3.min([end, d.ending_time])) {
           // No need to save reference since we have marked the first block that might overlap
           return d.type.overlapClass;
         }
