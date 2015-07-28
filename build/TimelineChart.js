@@ -140,7 +140,7 @@ var TimelineChart = (function () {
                 var range = overlapBlockHolder[d.worker][i];
                 var start = range.start;
                 var end = range.end;
-                if (d3.max([start, d.starting_time]) <= d3.min([end, d.ending_time])) {
+                if (d3.max([start, d.starting_time]) < d3.min([end, d.ending_time])) {
                     // No need to save reference since we have marked the first block that might overlap
                     return d.type.overlapClass;
                 }
@@ -258,7 +258,10 @@ var TimelineChart = (function () {
             return d;
         }).enter().append("g").attr("transform", function (d) {
             return "translate(" + _this.xScale(d.starting_time) + ", 0)";
-        }).attr("class", "block").attr("data-x", function (d) {
+        }).attr("class", "block").attr("id", function (d, i) {
+            var currentY = +d3.select(this.parentNode).attr("data-y");
+            return d.type.id + "-" + currentY + "-" + i;
+        }).attr("data-x", function (d) {
             return _this.xScale(d.starting_time);
         }).on("mouseover", function (d, i) {
             that.onMouseOver(this, d, i);

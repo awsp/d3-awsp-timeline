@@ -225,7 +225,7 @@ class TimelineChart implements TimelineChartInterface {
         var range = overlapBlockHolder[d.worker][i];
         var start = range.start;
         var end = range.end;
-        if (d3.max([start, d.starting_time]) <= d3.min([end, d.ending_time])) {
+        if (d3.max([start, d.starting_time]) < d3.min([end, d.ending_time])) {
           // No need to save reference since we have marked the first block that might overlap
           return d.type.overlapClass;
         }
@@ -383,6 +383,10 @@ class TimelineChart implements TimelineChartInterface {
         return "translate(" + this.xScale(d.starting_time) +  ", 0)";
       })
       .attr("class", "block")
+      .attr("id", function (d, i) {
+        var currentY: number = +d3.select(this.parentNode).attr("data-y");
+        return d.type.id + "-" + currentY + "-" + i;
+      })  
       .attr("data-x", (d) => {
         return this.xScale(d.starting_time);
       })

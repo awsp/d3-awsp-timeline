@@ -107,17 +107,45 @@ var TimelineScheduler = (function () {
         this.chart.setData(data);
         this.grouping.setData(data);
     };
+    /**
+     * Clear method
+     */
     TimelineScheduler.prototype.clear = function () {
         this.chart.clearNodes();
         this.chart.clearTimeline();
         this.grouping.clearNodes();
     };
     /**
-     * Main renderer
+     * Main render method
      */
     TimelineScheduler.prototype.render = function () {
         this.grouping.drawData();
         this.chart.draw();
+    };
+    /**
+     * Render method
+     * Same as render, but does a little bit, clear chart first then render
+     */
+    TimelineScheduler.prototype.reRender = function () {
+        this.clear();
+        this.render();
+    };
+    /**
+     * Soft render method
+     * Differ to render / reRender method which wipe the whole thing out,
+     * instead update the changed portion only.
+     *
+     * - Allow less resource to redraw changes
+     * - Allow animation aid
+     *
+     * TODO: not implemented.
+     */
+    TimelineScheduler.prototype.softRender = function () {
+        // Find out changes
+        // Pick by its identifier(id)
+        // Move it to the correct position
+        // Update its g data-x, data-y
+        // Update its identifier(id)
     };
     TimelineScheduler.scheduleModuleClass = "scheduler-module";
     TimelineScheduler.scheduleInnerClass = "scheduler-inner";

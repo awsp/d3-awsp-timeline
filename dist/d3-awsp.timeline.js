@@ -317,7 +317,7 @@ var TimelineChart = (function () {
                 var range = overlapBlockHolder[d.worker][i];
                 var start = range.start;
                 var end = range.end;
-                if (d3.max([start, d.starting_time]) <= d3.min([end, d.ending_time])) {
+                if (d3.max([start, d.starting_time]) < d3.min([end, d.ending_time])) {
                     // No need to save reference since we have marked the first block that might overlap
                     return d.type.overlapClass;
                 }
@@ -456,6 +456,10 @@ var TimelineChart = (function () {
             return "translate(" + _this.xScale(d.starting_time) + ", 0)";
         })
             .attr("class", "block")
+            .attr("id", function (d, i) {
+            var currentY = +d3.select(this.parentNode).attr("data-y");
+            return d.type.id + "-" + currentY + "-" + i;
+        })
             .attr("data-x", function (d) {
             return _this.xScale(d.starting_time);
         })
@@ -681,17 +685,45 @@ var TimelineScheduler = (function () {
         this.chart.setData(data);
         this.grouping.setData(data);
     };
+    /**
+     * Clear method
+     */
     TimelineScheduler.prototype.clear = function () {
         this.chart.clearNodes();
         this.chart.clearTimeline();
         this.grouping.clearNodes();
     };
     /**
-     * Main renderer
+     * Main render method
      */
     TimelineScheduler.prototype.render = function () {
         this.grouping.drawData();
         this.chart.draw();
+    };
+    /**
+     * Render method
+     * Same as render, but does a little bit, clear chart first then render
+     */
+    TimelineScheduler.prototype.reRender = function () {
+        this.clear();
+        this.render();
+    };
+    /**
+     * Soft render method
+     * Differ to render / reRender method which wipe the whole thing out,
+     * instead update the changed portion only.
+     *
+     * - Allow less resource to redraw changes
+     * - Allow animation aid
+     *
+     * TODO: not implemented.
+     */
+    TimelineScheduler.prototype.softRender = function () {
+        // Find out changes
+        // Pick by its identifier(id)
+        // Move it to the correct position
+        // Update its g data-x, data-y
+        // Update its identifier(id)
     };
     TimelineScheduler.scheduleModuleClass = "scheduler-module";
     TimelineScheduler.scheduleInnerClass = "scheduler-inner";

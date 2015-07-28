@@ -126,7 +126,7 @@ var generateRandomTimeData = function (date, n, workers) {
 
   for (var i = 0; i < n; i++) {
     randomNumber = Math.floor((Math.random() * (maximum - minimum + 1) ) << 0) + minimum;
-    sTimeFactor = +((Math.random() * 18).toFixed(0)); // set latest possibility to 18
+    sTimeFactor = (Math.random() * 18) << 0; // set latest possibility to 18
     startingTime = new Date(date + " " + sTimeFactor + ":00:00");
     eTimeFactor = sTimeFactor + (+(randomNumber));
     endingTime = new Date(date + " " + eTimeFactor + ":00:00");

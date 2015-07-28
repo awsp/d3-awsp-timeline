@@ -143,6 +143,9 @@ class TimelineScheduler {
     this.grouping.setData(data);
   }
 
+  /**
+   * Clear method
+   */
   public clear(): void {
     this.chart.clearNodes();
     this.chart.clearTimeline();
@@ -150,11 +153,38 @@ class TimelineScheduler {
   }
 
   /**
-   * Main renderer
+   * Main render method
    */
   public render(): void {
     this.grouping.drawData();
     this.chart.draw();
+  }
+
+  /**
+   * Render method
+   * Same as render, but does a little bit, clear chart first then render
+   */
+  public reRender(): void {
+    this.clear();
+    this.render();
+  }
+
+  /**
+   * Soft render method
+   * Differ to render / reRender method which wipe the whole thing out,
+   * instead update the changed portion only.
+   *
+   * - Allow less resource to redraw changes
+   * - Allow animation aid
+   *
+   * TODO: not implemented.
+   */
+  public softRender(): void {
+    // Find out changes
+    // Pick by its identifier(id)
+    // Move it to the correct position
+    // Update its g data-x, data-y
+    // Update its identifier(id)
   }
 
 }
