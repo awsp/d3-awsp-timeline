@@ -131,6 +131,10 @@ class TimelineChart implements TimelineChartInterface {
     this.axisFormat = format;
   }
 
+  /**
+   * Draw timeline
+   * @param timelineSvg
+   */
   public drawTimeline(timelineSvg?: any): void {
     if (!timelineSvg) {
       timelineSvg = this.timelineSvg;
@@ -145,6 +149,10 @@ class TimelineChart implements TimelineChartInterface {
     timelineSvg.attr("width", this.chartRange).attr("class", "changed").append("g").attr("class", "axis").attr("transform", "translate(0, " + (TimelineChart.timelineHeight - 1) + ")").call(xAxis);
   }
 
+  /**
+   * Draw grid
+   * @param chartSvg
+   */
   public drawGrid(chartSvg?: any): void {
     if (!chartSvg) {
       chartSvg = this.chartSvg;

@@ -55,6 +55,10 @@ var TimelineChart = (function () {
     TimelineChart.prototype.setXAxisFormat = function (format) {
         this.axisFormat = format;
     };
+    /**
+     * Draw timeline
+     * @param timelineSvg
+     */
     TimelineChart.prototype.drawTimeline = function (timelineSvg) {
         if (!timelineSvg) {
             timelineSvg = this.timelineSvg;
@@ -63,6 +67,10 @@ var TimelineChart = (function () {
         var xAxis = d3.svg.axis().scale(xScale).orient("top").ticks(d3.time.minutes, 30).tickSize(6).tickFormat(d3.time.format(this.axisFormat));
         timelineSvg.attr("width", this.chartRange).attr("class", "changed").append("g").attr("class", "axis").attr("transform", "translate(0, " + (TimelineChart.timelineHeight - 1) + ")").call(xAxis);
     };
+    /**
+     * Draw grid
+     * @param chartSvg
+     */
     TimelineChart.prototype.drawGrid = function (chartSvg) {
         if (!chartSvg) {
             chartSvg = this.chartSvg;
