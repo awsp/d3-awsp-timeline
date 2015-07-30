@@ -41,6 +41,84 @@ var TwoDimensionalShape = (function () {
     };
     return TwoDimensionalShape;
 })();
+var ScheduleType = (function () {
+    function ScheduleType(id, options) {
+        this.markOverlap = false;
+        this.height = 24;
+        this.hasLabel = false;
+        this.opacity = 0.9;
+        this.backgroundColor = "#ccffcc";
+        this.foregroundColor = "#447744";
+        this.zIndex = 0;
+        this.round = 0;
+        this.stroke = "";
+        this.strokeWidth = 0;
+        this.fontSize = 11;
+        this.overlapClass = "overlapping";
+        this.allowedBatch = [
+            "backgroundColor", "foregroundColor", "stroke", "strokeWidth", "fontSize",
+            "round", "zIndex", "opacity", "height", "markOverlap", "hasLabel", "name",
+            "overlapClass"
+        ];
+        this.setId(id);
+        if (options) {
+            this.setOptions(options);
+        }
+    }
+    ScheduleType.prototype.setOptions = function (options) {
+        if (options) {
+            for (var key in options) {
+                var value = options[key];
+                if (this.hasOwnProperty(key) && this.allowedBatch.indexOf(key) >= 0) {
+                    this[key] = value;
+                }
+            }
+        }
+        return this;
+    };
+    ScheduleType.prototype.setId = function (id) {
+        this.id = id;
+        return this;
+    };
+    ScheduleType.prototype.setName = function (name) {
+        this.name = name;
+        return this;
+    };
+    ScheduleType.prototype.enableOverlapping = function () {
+        this.markOverlap = true;
+        return this;
+    };
+    ScheduleType.prototype.disableOverlapping = function () {
+        this.markOverlap = false;
+        return this;
+    };
+    ScheduleType.prototype.enableLabeling = function () {
+        this.hasLabel = true;
+        return this;
+    };
+    ScheduleType.prototype.disableLabeling = function () {
+        this.hasLabel = false;
+        return this;
+    };
+    return ScheduleType;
+})();
+var ScheduleTypeCollection = (function () {
+    function ScheduleTypeCollection() {
+        this.list = [];
+    }
+    ScheduleTypeCollection.prototype.add = function (scheduleType) {
+        this.list.push(scheduleType);
+    };
+    ScheduleTypeCollection.prototype.remove = function (index) {
+        if (this.list[index]) {
+            delete this.list[index];
+        }
+    };
+    ScheduleTypeCollection.prototype.get = function () {
+        return this.list;
+    };
+    return ScheduleTypeCollection;
+})();
 ///<reference path="DefinitelyTyped/underscore/underscore.d.ts" />
 ///<reference path="Dimension.ts" />
 ///<reference path="TimelineChart.ts" />
@@ -68,8 +146,7 @@ var TimelineGroup = (function () {
         return this.aDimension;
     };
     TimelineGroup.prototype.height = function () {
-        var defaultHeight = +this.dimension().height();
-        return this.aHeight > defaultHeight ? this.aHeight : defaultHeight;
+        return Object.keys(this.aData).length * this.rowHeight;
     };
     TimelineGroup.prototype.setRowHeight = function (height) {
         this.rowHeight = height;
@@ -87,7 +164,7 @@ var TimelineGroup = (function () {
         this.gParent = gParent;
         this.moduleName = moduleName;
         this.aData = data;
-        var theoreticalHeight = this.aHeight = Object.keys(data).length * this.rowHeight;
+        var theoreticalHeight = this.aHeight = this.height();
         // Create a HTML element with attributes like width and height
         var domInstance = this.gParent.append("div");
         domInstance.attr("id", this.moduleName + "-grouping").attr("class", "list-module");
@@ -115,6 +192,7 @@ var TimelineGroup = (function () {
         var svg = this.svgInstance;
         var baseG = svg.append("g").attr("transform", "translate(0, 0)");
         var rowHeight = this.rowHeight;
+        svg.attr("height", this.height());
         var g = baseG.selectAll("g").data(d3.values(data));
         var gEnter = g.enter().append("g").attr("transform", function (d, i) {
             return "translate(0, " + rowHeight * i + ")";
@@ -219,8 +297,7 @@ var TimelineChart = (function () {
         this.rowHeight = height;
     };
     TimelineChart.prototype.height = function () {
-        var defaultHeight = +this.dimension().height();
-        return this.aHeight > defaultHeight ? this.aHeight : defaultHeight;
+        return Object.keys(this.aData).length * this.rowHeight;
     };
     TimelineChart.prototype.width = function () {
         return this.dimension().width();
@@ -231,6 +308,10 @@ var TimelineChart = (function () {
     TimelineChart.prototype.setXAxisFormat = function (format) {
         this.axisFormat = format;
     };
+    /**
+     * Draw timeline
+     * @param timelineSvg
+     */
     TimelineChart.prototype.drawTimeline = function (timelineSvg) {
         if (!timelineSvg) {
             timelineSvg = this.timelineSvg;
@@ -244,6 +325,10 @@ var TimelineChart = (function () {
             .tickFormat(d3.time.format(this.axisFormat));
         timelineSvg.attr("width", this.chartRange).attr("class", "changed").append("g").attr("class", "axis").attr("transform", "translate(0, " + (TimelineChart.timelineHeight - 1) + ")").call(xAxis);
     };
+    /**
+     * Draw grid
+     * @param chartSvg
+     */
     TimelineChart.prototype.drawGrid = function (chartSvg) {
         if (!chartSvg) {
             chartSvg = this.chartSvg;
@@ -265,7 +350,7 @@ var TimelineChart = (function () {
         this.moduleName = moduleName;
         this.aData = data;
         var theoreticalWidth = this.chartRange;
-        var theoreticalHeight = this.aHeight = Object.keys(data).length * this.rowHeight;
+        var theoreticalHeight = this.aHeight = this.height();
         // `chart-module` DOM
         var chartModuleDom = this.gParent.append("div");
         chartModuleDom.attr("id", this.moduleName + "-chart").attr("class", "chart-module");
@@ -446,8 +531,9 @@ var TimelineChart = (function () {
         var _this = this;
         // Timeline SVG timeline
         this.drawTimeline();
-        // Update length
+        // Update SVG properties
         this.chartSvg.attr("width", this.chartRange);
+        this.chartSvg.attr("height", this.height());
         // Timeline Grid
         this.drawGrid();
         // Save class reference

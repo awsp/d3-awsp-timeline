@@ -43,8 +43,7 @@ var TimelineChart = (function () {
         this.rowHeight = height;
     };
     TimelineChart.prototype.height = function () {
-        var defaultHeight = +this.dimension().height();
-        return this.aHeight > defaultHeight ? this.aHeight : defaultHeight;
+        return Object.keys(this.aData).length * this.rowHeight;
     };
     TimelineChart.prototype.width = function () {
         return this.dimension().width();
@@ -55,6 +54,10 @@ var TimelineChart = (function () {
     TimelineChart.prototype.setXAxisFormat = function (format) {
         this.axisFormat = format;
     };
+    /**
+     * Draw timeline
+     * @param timelineSvg
+     */
     TimelineChart.prototype.drawTimeline = function (timelineSvg) {
         if (!timelineSvg) {
             timelineSvg = this.timelineSvg;
@@ -63,6 +66,10 @@ var TimelineChart = (function () {
         var xAxis = d3.svg.axis().scale(xScale).orient("top").ticks(d3.time.minutes, 30).tickSize(6).tickFormat(d3.time.format(this.axisFormat));
         timelineSvg.attr("width", this.chartRange).attr("class", "changed").append("g").attr("class", "axis").attr("transform", "translate(0, " + (TimelineChart.timelineHeight - 1) + ")").call(xAxis);
     };
+    /**
+     * Draw grid
+     * @param chartSvg
+     */
     TimelineChart.prototype.drawGrid = function (chartSvg) {
         if (!chartSvg) {
             chartSvg = this.chartSvg;
@@ -84,7 +91,7 @@ var TimelineChart = (function () {
         this.moduleName = moduleName;
         this.aData = data;
         var theoreticalWidth = this.chartRange;
-        var theoreticalHeight = this.aHeight = Object.keys(data).length * this.rowHeight;
+        var theoreticalHeight = this.aHeight = this.height();
         // `chart-module` DOM
         var chartModuleDom = this.gParent.append("div");
         chartModuleDom.attr("id", this.moduleName + "-chart").attr("class", "chart-module");
@@ -248,8 +255,9 @@ var TimelineChart = (function () {
         var _this = this;
         // Timeline SVG timeline
         this.drawTimeline();
-        // Update length
+        // Update SVG properties
         this.chartSvg.attr("width", this.chartRange);
+        this.chartSvg.attr("height", this.height());
         // Timeline Grid
         this.drawGrid();
         // Save class reference

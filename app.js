@@ -3,46 +3,44 @@ var rowHeight = 60;
 
 // Types of Bar
 // TODO: create a class for type, and type collection
-var types = [
-  {
-    id: "availability",
-    name: "Availabilities",
-    backgroundColor: "#ccffcc",
-    foregroundColor: "#447744",
-    opacity: 0.4,
-    height: rowHeight,
-    hasLabel: false,
-    zIndex: 0,
-    markOverlap: false
-  },
-  {
-    id: "busy",
-    name: "Busy",
-    backgroundColor: "#ffcccc",
-    foregroundColor: "#774444",
-    opacity: 0.4,
-    height: rowHeight,
-    hasLabel: false,
-    zIndex: 1,
-    markOverlap: false
-  },
-  {
-    id: "work",
-    name: "Working Schedule",
-    backgroundColor: "#4D82CC",
-    foregroundColor: "#fff",
-    opacity: 0.7,
-    height: 28,
-    stroke: "#4D82CC",
-    strokeWidth: 3,
-    round: 3,
-    hasLabel: true,
-    fontSize: 11,
-    zIndex: 2,
-    markOverlap: true,
-    overlapClass: "overlapping"
-  }
-];
+var typeList = new ScheduleTypeCollection(); 
+typeList.add(new ScheduleType("availability", {
+  opacity: 0.4,
+  backgroundColor: "#ccffcc",
+  foregroundColor: "#447744",
+  rowHeight: rowHeight,
+  name: "Availability"
+}));
+
+typeList.add(new ScheduleType("work", {
+  name: "Working Schedule",
+  backgroundColor: "#4D82CC",
+  foregroundColor: "#fff",
+  opacity: 0.7,
+  height: 28,
+  stroke: "#4D82CC",
+  strokeWidth: 3,
+  round: 3,
+  hasLabel: true,
+  fontSize: 11,
+  zIndex: 2,
+  markOverlap: true,
+  overlapClass: "overlapping"
+}));
+
+typeList.add(new ScheduleType("busy", {
+  name: "Busy",
+  backgroundColor: "#ffcccc",
+  foregroundColor: "#774444",
+  opacity: 0.4,
+  height: rowHeight,
+  hasLabel: false,
+  zIndex: 1,
+  markOverlap: false
+}));
+
+
+var types = typeList.get();
 
 // Scheduler
 var dimension = new TwoDimensionalShape("100%", 400);
@@ -118,6 +116,8 @@ var workers = [
     lastName: "Person"
   }
 ];
+
+
 // Generate some random data to display
 var generateRandomTimeData = function (date, n, workers) {
   var data = [];
@@ -141,6 +141,7 @@ var generateRandomTimeData = function (date, n, workers) {
   }
   return data;
 };
+
 var testData = generateRandomTimeData("2015-07-14", 150, workers);
 var data = TimelineScheduler.processData(testData, "worker");
 
@@ -222,7 +223,7 @@ grouping.setRowHeight(rowHeight);
 
 
 // Render Scheduler
-var scheduler = new TimelineScheduler("#scheduler", dimension, data, chart, grouping);
+var scheduler = new TimelineScheduler("#scheduler", dimension, [], chart, grouping);
 scheduler.render();
 
 
@@ -273,7 +274,7 @@ d3.select("body").on("keydown", function () {
     });
 
     $("#draw").on("click", function () {
-      scheduler.render();
+      scheduler.reRender();
     });
   });
 })(jQuery, scheduler, workers);

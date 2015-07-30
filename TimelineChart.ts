@@ -115,8 +115,7 @@ class TimelineChart implements TimelineChartInterface {
   }
 
   public height(): d3.Primitive {
-    var defaultHeight: d3.Primitive = +this.dimension().height();
-    return this.aHeight > defaultHeight ? this.aHeight : defaultHeight;
+    return Object.keys(this.aData).length * this.rowHeight;
   }
 
   public width(): d3.Primitive {
@@ -131,6 +130,10 @@ class TimelineChart implements TimelineChartInterface {
     this.axisFormat = format;
   }
 
+  /**
+   * Draw timeline
+   * @param timelineSvg
+   */
   public drawTimeline(timelineSvg?: any): void {
     if (!timelineSvg) {
       timelineSvg = this.timelineSvg;
@@ -145,6 +148,10 @@ class TimelineChart implements TimelineChartInterface {
     timelineSvg.attr("width", this.chartRange).attr("class", "changed").append("g").attr("class", "axis").attr("transform", "translate(0, " + (TimelineChart.timelineHeight - 1) + ")").call(xAxis);
   }
 
+  /**
+   * Draw grid
+   * @param chartSvg
+   */
   public drawGrid(chartSvg?: any): void {
     if (!chartSvg) {
       chartSvg = this.chartSvg;
@@ -167,7 +174,7 @@ class TimelineChart implements TimelineChartInterface {
     this.moduleName = moduleName;
     this.aData = data;
     var theoreticalWidth: number = this.chartRange;
-    var theoreticalHeight: number = this.aHeight = Object.keys(data).length * this.rowHeight;
+    var theoreticalHeight: number = this.aHeight = <number>this.height();
 
     // `chart-module` DOM
     var chartModuleDom = this.gParent.append("div");
@@ -377,8 +384,9 @@ class TimelineChart implements TimelineChartInterface {
     // Timeline SVG timeline
     this.drawTimeline();
 
-    // Update length
+    // Update SVG properties
     this.chartSvg.attr("width", this.chartRange);
+    this.chartSvg.attr("height", <number>this.height());
 
     // Timeline Grid
     this.drawGrid();
