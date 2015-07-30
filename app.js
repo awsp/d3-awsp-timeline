@@ -223,7 +223,7 @@ grouping.setRowHeight(rowHeight);
 
 
 // Render Scheduler
-var scheduler = new TimelineScheduler("#scheduler", dimension, [], chart, grouping);
+var scheduler = new TimelineScheduler("#scheduler", dimension, data, chart, grouping);
 scheduler.render();
 
 
