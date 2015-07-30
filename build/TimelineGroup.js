@@ -25,8 +25,7 @@ var TimelineGroup = (function () {
         return this.aDimension;
     };
     TimelineGroup.prototype.height = function () {
-        var defaultHeight = +this.dimension().height();
-        return this.aHeight > defaultHeight ? this.aHeight : defaultHeight;
+        return Object.keys(this.aData).length * this.rowHeight;
     };
     TimelineGroup.prototype.setRowHeight = function (height) {
         this.rowHeight = height;
@@ -44,7 +43,7 @@ var TimelineGroup = (function () {
         this.gParent = gParent;
         this.moduleName = moduleName;
         this.aData = data;
-        var theoreticalHeight = this.aHeight = Object.keys(data).length * this.rowHeight;
+        var theoreticalHeight = this.aHeight = this.height();
         // Create a HTML element with attributes like width and height
         var domInstance = this.gParent.append("div");
         domInstance.attr("id", this.moduleName + "-grouping").attr("class", "list-module");
@@ -70,6 +69,7 @@ var TimelineGroup = (function () {
         var svg = this.svgInstance;
         var baseG = svg.append("g").attr("transform", "translate(0, 0)");
         var rowHeight = this.rowHeight;
+        svg.attr("height", this.height());
         var g = baseG.selectAll("g").data(d3.values(data));
         var gEnter = g.enter().append("g").attr("transform", function (d, i) {
             return "translate(0, " + rowHeight * i + ")";

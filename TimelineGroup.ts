@@ -59,8 +59,7 @@ class TimelineGroup implements TimelineGroupInterface {
   }
 
   public height(): d3.Primitive {
-    var defaultHeight: d3.Primitive = +this.dimension().height();
-    return this.aHeight > defaultHeight ? this.aHeight : defaultHeight;
+    return Object.keys(this.aData).length * this.rowHeight;
   }
 
   public setRowHeight(height: number): void {
@@ -81,7 +80,7 @@ class TimelineGroup implements TimelineGroupInterface {
     this.gParent = gParent;
     this.moduleName = moduleName;
     this.aData = data;
-    var theoreticalHeight: d3.Primitive = this.aHeight = Object.keys(data).length * this.rowHeight;
+    var theoreticalHeight: d3.Primitive = this.aHeight = <number>this.height();
 
     // Create a HTML element with attributes like width and height
     var domInstance = this.gParent.append("div");
@@ -113,6 +112,8 @@ class TimelineGroup implements TimelineGroupInterface {
     var svg = this.svgInstance;
     var baseG = svg.append("g").attr("transform", "translate(0, 0)");
     var rowHeight = this.rowHeight;
+
+    svg.attr("height", this.height());
 
     var g = baseG.selectAll("g").data(d3.values(data));
     var gEnter = g.enter().append("g").attr("transform", (d: any, i: number) => {

@@ -223,7 +223,7 @@ grouping.setRowHeight(rowHeight);
 
 
 // Render Scheduler
-var scheduler = new TimelineScheduler("#scheduler", dimension, data, chart, grouping);
+var scheduler = new TimelineScheduler("#scheduler", dimension, [], chart, grouping);
 scheduler.render();
 
 
@@ -274,7 +274,7 @@ d3.select("body").on("keydown", function () {
     });
 
     $("#draw").on("click", function () {
-      scheduler.render();
+      scheduler.reRender();
     });
   });
 })(jQuery, scheduler, workers);

@@ -43,8 +43,7 @@ var TimelineChart = (function () {
         this.rowHeight = height;
     };
     TimelineChart.prototype.height = function () {
-        var defaultHeight = +this.dimension().height();
-        return this.aHeight > defaultHeight ? this.aHeight : defaultHeight;
+        return Object.keys(this.aData).length * this.rowHeight;
     };
     TimelineChart.prototype.width = function () {
         return this.dimension().width();
@@ -92,7 +91,7 @@ var TimelineChart = (function () {
         this.moduleName = moduleName;
         this.aData = data;
         var theoreticalWidth = this.chartRange;
-        var theoreticalHeight = this.aHeight = Object.keys(data).length * this.rowHeight;
+        var theoreticalHeight = this.aHeight = this.height();
         // `chart-module` DOM
         var chartModuleDom = this.gParent.append("div");
         chartModuleDom.attr("id", this.moduleName + "-chart").attr("class", "chart-module");
@@ -256,8 +255,9 @@ var TimelineChart = (function () {
         var _this = this;
         // Timeline SVG timeline
         this.drawTimeline();
-        // Update length
+        // Update SVG properties
         this.chartSvg.attr("width", this.chartRange);
+        this.chartSvg.attr("height", this.height());
         // Timeline Grid
         this.drawGrid();
         // Save class reference
