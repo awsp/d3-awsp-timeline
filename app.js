@@ -2,13 +2,12 @@
 var rowHeight = 60;
 
 // Types of Bar
-// TODO: create a class for type, and type collection
 var typeList = new ScheduleTypeCollection(); 
 typeList.add(new ScheduleType("availability", {
   opacity: 0.4,
   backgroundColor: "#ccffcc",
   foregroundColor: "#447744",
-  rowHeight: rowHeight,
+  height: rowHeight,
   name: "Availability"
 }));
 
