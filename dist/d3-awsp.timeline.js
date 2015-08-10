@@ -387,7 +387,9 @@ var TimelineChart = (function () {
     TimelineChart.prototype.updateXAxis = function () {
         var start = this.chartStart.getTime();
         var end = this.chartEnd.getTime();
-        this.chartRange = (end - start) / 36000;
+        if (!(isNaN(start) || isNaN(end))) {
+            this.chartRange = (end - start) / 36000;
+        }
         this.xScale = d3.time.scale().domain([start, end]).range([0, this.chartRange]);
         return this.xScale;
     };
@@ -442,7 +444,7 @@ var TimelineChart = (function () {
             return d.type.backgroundColor;
         })
             .attr("height", function (d) {
-            return d.type.height;
+            return d.type.height ? +d.type.height : rowHeight;
         })
             .attr("width", function (d) {
             return _this.xScale(new Date(d.ending_time)) - _this.xScale(new Date(d.starting_time));

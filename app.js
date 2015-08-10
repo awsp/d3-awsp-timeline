@@ -247,8 +247,8 @@ d3.select("body").on("keydown", function () {
     });
 
     $("#change-data").on("click", function () {
-      var newTestData = TimelineScheduler.processData(generateRandomTimeData("2015-07-16", 150, workers), "worker");
-      scheduler.chart.setBusinessHours(new Date("2015-07-16 04:00:00"), new Date("2015-07-17 14:00:00"));
+      var newTestData = TimelineScheduler.processData(generateRandomTimeData("2015-07-24", 150, workers), "worker");
+      scheduler.chart.setBusinessHours(new Date("2015-07-24 06:00:00"), new Date("2015-07-24 23:00:00"));
       scheduler.setData(newTestData);
       console.log("data and date range changed. ");
     });

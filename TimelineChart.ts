@@ -220,7 +220,9 @@ class TimelineChart implements TimelineChartInterface {
   public updateXAxis(): any {
     var start: number = this.chartStart.getTime();
     var end: number = this.chartEnd.getTime();
-    this.chartRange = (end - start) / 36000;
+    if (! (isNaN(start) || isNaN(end))) {
+      this.chartRange = (end - start) / 36000;
+    }
 
     this.xScale = d3.time.scale().domain([start, end]).range([0, this.chartRange]);
     return this.xScale;
@@ -284,7 +286,7 @@ class TimelineChart implements TimelineChartInterface {
         return d.type.backgroundColor;
       })
       .attr("height", (d) => {
-        return d.type.height;
+        return d.type.height ? +d.type.height : rowHeight;
       })
       .attr("width", (d) => {
         return this.xScale(new Date(d.ending_time)) - this.xScale(new Date(d.starting_time));
