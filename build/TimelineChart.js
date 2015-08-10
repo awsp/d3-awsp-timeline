@@ -130,8 +130,8 @@ var TimelineChart = (function () {
         var end = this.chartEnd.getTime();
         if (!(isNaN(start) || isNaN(end))) {
             this.chartRange = (end - start) / 36000;
+            this.xScale = d3.time.scale().domain([start, end]).range([0, this.chartRange]);
         }
-        this.xScale = d3.time.scale().domain([start, end]).range([0, this.chartRange]);
         return this.xScale;
     };
     TimelineChart.prototype.onMouseOver = function (svg, data, i) {
