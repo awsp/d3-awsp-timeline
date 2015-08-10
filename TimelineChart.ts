@@ -281,7 +281,9 @@ class TimelineChart implements TimelineChartInterface {
   public drawBlocks(blockG: any): void {
     var rowHeight = this.rowHeight;
 
-    blockG.append("rect")
+    blockG.filter((d) => {
+      return ! (isNaN(d.starting_time) || isNaN(d.ending_time));
+    }).append("rect")
       .attr("fill", (d) => {
         return d.type.backgroundColor;
       })

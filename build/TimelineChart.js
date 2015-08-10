@@ -180,7 +180,9 @@ var TimelineChart = (function () {
     TimelineChart.prototype.drawBlocks = function (blockG) {
         var _this = this;
         var rowHeight = this.rowHeight;
-        blockG.append("rect").attr("fill", function (d) {
+        blockG.filter(function (d) {
+            return !(isNaN(d.starting_time) || isNaN(d.ending_time));
+        }).append("rect").attr("fill", function (d) {
             return d.type.backgroundColor;
         }).attr("height", function (d) {
             return d.type.height ? +d.type.height : rowHeight;
