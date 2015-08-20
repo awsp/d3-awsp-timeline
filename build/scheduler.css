@@ -140,7 +140,7 @@ body {
   shape-rendering: crispEdges;
 }
 .axis text {
-  font-size: 11px;
+  font-size: 9px;
   fill: #666;
   font-family: "Hiragino Kaku Gothic Pro", sans-serif;
 }
