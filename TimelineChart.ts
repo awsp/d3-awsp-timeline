@@ -91,7 +91,8 @@ class TimelineChart implements TimelineChartInterface {
   public tooltipInner: any;
   public tooltipClass = "tooltip";
 
-  public timeFactor = 3600000;
+  public timeFactor: number = 3600000;
+  public timeRangeBase: number = 36000;
 
   /**
    * Constructor
@@ -160,7 +161,7 @@ class TimelineChart implements TimelineChartInterface {
       chartSvg = this.chartSvg;
     }
 
-    var ticks: number = ((this.chartEnd - this.chartStart) / this.timeFactor) * 2;
+    var ticks: number = ((this.chartEnd.getTime() - this.chartStart.getTime()) / this.timeFactor) * 2;
     var factor = this.chartRange / ticks;
     var tickValues = _.range(0, factor * (ticks + 1), factor);
 
@@ -229,7 +230,7 @@ class TimelineChart implements TimelineChartInterface {
     var start: number = this.chartStart.getTime();
     var end: number = this.chartEnd.getTime();
     if (! (isNaN(start) || isNaN(end))) {
-      this.chartRange = (end - start) / 63000;
+      this.chartRange = (end - start) / this.timeRangeBase;
       this.xScale = d3.time.scale().domain([start, end]).range([0, this.chartRange]);
     }
 

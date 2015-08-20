@@ -27,6 +27,7 @@ var TimelineChart = (function () {
         this.axisFormat = "%H:%M";
         this.tooltipClass = "tooltip";
         this.timeFactor = 3600000;
+        this.timeRangeBase = 36000;
         if (!dimension) {
             throw new Error("Dimension is not set. ");
         }
@@ -75,7 +76,7 @@ var TimelineChart = (function () {
         if (!chartSvg) {
             chartSvg = this.chartSvg;
         }
-        var ticks = ((this.chartEnd - this.chartStart) / this.timeFactor) * 2;
+        var ticks = ((this.chartEnd.getTime() - this.chartStart.getTime()) / this.timeFactor) * 2;
         var factor = this.chartRange / ticks;
         var tickValues = _.range(0, factor * (ticks + 1), factor);
         var xGridScale = d3.scale.linear().domain([0, this.chartRange]).range([0, this.chartRange]);
@@ -132,7 +133,7 @@ var TimelineChart = (function () {
         var start = this.chartStart.getTime();
         var end = this.chartEnd.getTime();
         if (!(isNaN(start) || isNaN(end))) {
-            this.chartRange = (end - start) / 63000;
+            this.chartRange = (end - start) / this.timeRangeBase;
             this.xScale = d3.time.scale().domain([start, end]).range([0, this.chartRange]);
         }
         return this.xScale;

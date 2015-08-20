@@ -149,6 +149,7 @@ var chart = new TimelineChart(new TwoDimensionalShape(800, 400));
 chart.setRowHeight(rowHeight);
 chart.setBusinessHours(new Date("2015-07-14 08:30:00"), new Date("2015-07-15 01:00:00"));
 chart.setChartRange(1200);
+chart.timeRangeBase = 54000;
 chart.onMouseOver = function (self, data, i) {
   if (data.type.id === "work") {
     if (! d3.select(self).classed("selected")) {

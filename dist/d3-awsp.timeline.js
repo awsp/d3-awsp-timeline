@@ -280,6 +280,8 @@ var TimelineChart = (function () {
         // X Axis Format
         this.axisFormat = "%H:%M";
         this.tooltipClass = "tooltip";
+        this.timeFactor = 3600000;
+        this.timeRangeBase = 36000;
         if (!dimension) {
             throw new Error("Dimension is not set. ");
         }
@@ -316,7 +318,7 @@ var TimelineChart = (function () {
         if (!timelineSvg) {
             timelineSvg = this.timelineSvg;
         }
-        var xScale = this.xScale = this.updateXAxis();
+        var xScale = this.xScale = this.updateXScale();
         var xAxis = d3.svg.axis()
             .scale(xScale)
             .orient("top")
@@ -333,9 +335,11 @@ var TimelineChart = (function () {
         if (!chartSvg) {
             chartSvg = this.chartSvg;
         }
-        var ticks = 24 * 2;
+        var ticks = ((this.chartEnd.getTime() - this.chartStart.getTime()) / this.timeFactor) * 2;
+        var factor = this.chartRange / ticks;
+        var tickValues = _.range(0, factor * (ticks + 1), factor);
         var xGridScale = d3.scale.linear().domain([0, this.chartRange]).range([0, this.chartRange]);
-        var xGrid = d3.svg.axis().scale(xGridScale).orient("bottom").ticks(ticks).tickFormat("").tickSize(-this.chartRange, 0);
+        var xGrid = d3.svg.axis().scale(xGridScale).orient("bottom").tickFormat("").tickSize(-this.chartRange, 0).tickValues(tickValues);
         chartSvg.append("g").attr("class", "grid").attr("transform", "translate(0," + this.chartRange + ")").call(xGrid);
     };
     /**
@@ -384,11 +388,11 @@ var TimelineChart = (function () {
      * Shall be called, after changing business hours, or chart width.
      * @returns {d3.time.Scale<any, number>}
      */
-    TimelineChart.prototype.updateXAxis = function () {
+    TimelineChart.prototype.updateXScale = function () {
         var start = this.chartStart.getTime();
         var end = this.chartEnd.getTime();
         if (!(isNaN(start) || isNaN(end))) {
-            this.chartRange = (end - start) / 36000;
+            this.chartRange = (end - start) / this.timeRangeBase;
             this.xScale = d3.time.scale().domain([start, end]).range([0, this.chartRange]);
         }
         return this.xScale;
@@ -622,7 +626,7 @@ var TimelineChart = (function () {
         this.chartStart = start;
         this.chartEnd = end;
         // Update x axis scaling
-        this.updateXAxis();
+        this.updateXScale();
     };
     /**
      * Short form / Alias for setting daily business hours
@@ -676,6 +680,9 @@ var TimelineChart = (function () {
             return "opacity: 0;";
         });
         return this.tooltipInner;
+    };
+    TimelineChart.prototype.setChartRange = function (chartRange) {
+        this.chartRange = chartRange;
     };
     // Timeline CSS Class Name, used to do some jQuery stuff.
     TimelineChart.scrollableTimelineClass = "timeline-scrollable";
