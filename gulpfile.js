@@ -1,15 +1,22 @@
 var gulp = require('gulp');
+var watch = require('gulp-watch');
 var minifyCss = require('gulp-minify-css');
 var uglify = require('gulp-uglify');
 var typescript = require('gulp-tsc');
 var rename = require('gulp-rename');
 var Q = require('q');
+var budo = require('budo');
 
 var outFileStem = 'd3-awsp.timeline';
 var out = 'dist/';
 
 // Tasks
 gulp.task('default', function () {
+
+});
+
+// Watch file for changes
+gulp.task('watch', [], function (callbac) {
 
 });
 

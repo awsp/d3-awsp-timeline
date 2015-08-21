@@ -1,0 +1,37 @@
+{
+  "name": "d3-awsp-timeline",
+  "version": "0.5.0",
+  "description": "A d3.js gantt chart for scheduling. ",
+  "main": "app.js",
+  "dependencies": {
+    "gulp-minify-css": "^1.2.0",
+    "gulp": "^3.9.0",
+    "gulp-tsc": "^1.0.0",
+    "gulp-uglify": "^1.2.0",
+    "gulp-rename": "^1.2.2",
+    "q": "^1.4.1"
+  },
+  "devDependencies": {
+    "budo": "^4.2.1",
+    "gulp": "^3.9.0",
+    "gulp-watch": "^4.3.5"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/awsp/d3-awsp-timeline.git"
+  },
+  "keywords": [
+    "d3.js",
+    "gantt",
+    "chart"
+  ],
+  "author": "Anthony Wu <anthony@ssetp.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/awsp/d3-awsp-timeline/issues"
+  },
+  "homepage": "https://github.com/awsp/d3-awsp-timeline#readme"
+}

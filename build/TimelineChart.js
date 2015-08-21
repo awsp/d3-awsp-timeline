@@ -69,7 +69,7 @@ var TimelineChart = (function () {
         timelineSvg.attr("width", this.chartRange).attr("class", "changed").append("g").attr("class", "axis").attr("transform", "translate(0, " + (TimelineChart.timelineHeight - 1) + ")").call(xAxis);
     };
     /**
-     * Draw grid
+     * Draw vertical grid
      * @param chartSvg
      */
     TimelineChart.prototype.drawGrid = function (chartSvg) {
@@ -83,7 +83,10 @@ var TimelineChart = (function () {
         var xGrid = d3.svg.axis().scale(xGridScale).orient("bottom").tickFormat("").tickSize(-this.chartRange, 0).tickValues(tickValues);
         chartSvg.append("g").attr("class", "grid").attr("transform", "translate(0," + this.chartRange + ")").call(xGrid);
     };
-    // TODO: working on 
+    /**
+     * Draw horizontal grid
+     * @param chartSvg
+     */
     TimelineChart.prototype.drawHGrid = function (chartSvg) {
         if (!chartSvg) {
             chartSvg = this.chartSvg;

@@ -154,7 +154,7 @@ class TimelineChart implements TimelineChartInterface {
   }
 
   /**
-   * Draw grid
+   * Draw vertical grid
    * @param chartSvg
    */
   public drawGrid(chartSvg?: any): void {
@@ -172,7 +172,10 @@ class TimelineChart implements TimelineChartInterface {
     chartSvg.append("g").attr("class", "grid").attr("transform", "translate(0," + this.chartRange + ")").call(xGrid);
   }
 
-  // TODO: working on 
+  /**
+   * Draw horizontal grid
+   * @param chartSvg
+   */
   public drawHGrid(chartSvg?: any): void {
     if (!chartSvg) {
       chartSvg = this.chartSvg;
