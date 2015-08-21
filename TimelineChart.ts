@@ -12,6 +12,7 @@ interface TimelineChartInterface {
   drawTimeline(timelineSvg?: any): void;
   drawBlocks(blockG: any): void;
   drawGrid(chartSvg?: any): void;
+  drawHGrid(chartSvg?: any): void;
 
   setDate(date: string): void;
   setBusinessHours(start: Date, end: Date): void;
@@ -169,6 +170,33 @@ class TimelineChart implements TimelineChartInterface {
     var xGrid = d3.svg.axis().scale(xGridScale).orient("bottom").tickFormat("").tickSize(-this.chartRange, 0).tickValues(tickValues);
 
     chartSvg.append("g").attr("class", "grid").attr("transform", "translate(0," + this.chartRange + ")").call(xGrid);
+  }
+
+  // TODO: working on 
+  public drawHGrid(chartSvg?: any): void {
+    if (!chartSvg) {
+      chartSvg = this.chartSvg;
+    }
+
+    
+    var ticks: number = Object.keys(this.aData).length; 
+    var tickValues: Array<number> = _.range(0, ticks * this.rowHeight, this.rowHeight);
+
+    var y = d3.scale.linear()
+      .domain([0, +this.height()])
+      .range([+this.height(), 0]);
+
+    var yAxis = d3.svg.axis()
+      .scale(y)
+      .tickSize(this.chartRange)
+      .tickValues(tickValues)
+      .tickFormat('')
+      .orient("right");
+
+    chartSvg.append("g")
+      .attr("class", "y axis")
+      .call(yAxis);
+
   }
 
   /**
@@ -403,6 +431,7 @@ class TimelineChart implements TimelineChartInterface {
 
     // Timeline Grid
     this.drawGrid();
+    this.drawHGrid();
 
     // Save class reference
     var that = this;

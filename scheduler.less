@@ -5,6 +5,9 @@
 @rowEvenColor: #ffffff;
 @rowOddColor: #efefef;
 @tooltipBackground: rgba(0, 0, 0, 0.6);
+@timelineColor: #aaa;
+@hGridColor: #ddd;
+@vGridColor: #f4f4f4;
 
 
 /* Common Classes */
@@ -122,13 +125,16 @@ body {
 .axis {
   path, line {
     fill: none;
-    stroke: #aaa;
+    stroke: @timelineColor;
     shape-rendering: crispEdges;
   }
   text {
     font-size: 9px;
     fill: #666;
     font-family: "Hiragino Kaku Gothic Pro", sans-serif;
+  }
+  &.y line {
+    stroke: @hGridColor;
   }
 }
 
@@ -138,7 +144,7 @@ body {
 }
 
 .grid .tick {
-  stroke: #eee;
+  stroke: @vGridColor;
   opacity: 0.7;
 }
 .grid path {

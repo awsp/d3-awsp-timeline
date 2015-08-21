@@ -83,6 +83,17 @@ var TimelineChart = (function () {
         var xGrid = d3.svg.axis().scale(xGridScale).orient("bottom").tickFormat("").tickSize(-this.chartRange, 0).tickValues(tickValues);
         chartSvg.append("g").attr("class", "grid").attr("transform", "translate(0," + this.chartRange + ")").call(xGrid);
     };
+    // TODO: working on 
+    TimelineChart.prototype.drawHGrid = function (chartSvg) {
+        if (!chartSvg) {
+            chartSvg = this.chartSvg;
+        }
+        var ticks = Object.keys(this.aData).length;
+        var tickValues = _.range(0, ticks * this.rowHeight, this.rowHeight);
+        var y = d3.scale.linear().domain([0, +this.height()]).range([+this.height(), 0]);
+        var yAxis = d3.svg.axis().scale(y).tickSize(this.chartRange).tickValues(tickValues).tickFormat('').orient("right");
+        chartSvg.append("g").attr("class", "y axis").call(yAxis);
+    };
     /**
      * Set up chart, timeline
      * @param moduleName
@@ -268,6 +279,7 @@ var TimelineChart = (function () {
         this.chartSvg.attr("height", this.height());
         // Timeline Grid
         this.drawGrid();
+        this.drawHGrid();
         // Save class reference
         var that = this;
         // Base G
