@@ -2,7 +2,7 @@
 var rowHeight = 60;
 
 // Types of Bar
-var typeList = new ScheduleTypeCollection(); 
+var typeList = new ScheduleTypeCollection();
 typeList.add(new ScheduleType("availability", {
   opacity: 0.4,
   backgroundColor: "#ccffcc",
@@ -147,7 +147,9 @@ var data = TimelineScheduler.processData(testData, "worker");
 // TimelineChart
 var chart = new TimelineChart(new TwoDimensionalShape(800, 400));
 chart.setRowHeight(rowHeight);
-chart.setBusinessHours(new Date("2015-07-14 00:00:00"), new Date("2015-07-15 03:59:59"));
+chart.setBusinessHours(new Date("2015-07-14 08:30:00"), new Date("2015-07-15 01:00:00"));
+chart.setChartRange(1200);
+chart.timeRangeBase = 63000;
 chart.onMouseOver = function (self, data, i) {
   if (data.type.id === "work") {
     if (! d3.select(self).classed("selected")) {
@@ -235,7 +237,7 @@ d3.select("body").on("keydown", function () {
 
 
 // Button Controls
-(function ($, scheduler, workers) {
+(function ($, scheduler, workers, TimelineScheduler, d3) {
   $(function () {
     $("body").on("click", "#close-tooltip", function (e) {
       e.preventDefault();
@@ -276,4 +278,4 @@ d3.select("body").on("keydown", function () {
       scheduler.reRender();
     });
   });
-})(jQuery, scheduler, workers);
+})(jQuery, scheduler, workers, TimelineScheduler, d3);

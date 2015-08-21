@@ -12,9 +12,11 @@ interface TimelineChartInterface {
   drawTimeline(timelineSvg?: any): void;
   drawBlocks(blockG: any): void;
   drawGrid(chartSvg?: any): void;
+  drawHGrid(chartSvg?: any): void;
 
   setDate(date: string): void;
   setBusinessHours(start: Date, end: Date): void;
+  setChartRange(chartRange: number): void;
 
   labeling(d: any, i?: number): any;
   onMouseOver(svg: any, data: any, i: number): void;
@@ -25,7 +27,7 @@ interface TimelineChartInterface {
   setXAxisFormat(format: string): void;
   setRowHeight(height: number): void;
 
-  updateXAxis(): any;
+  updateXScale(): any;
 
   clearAll(): void;
   clearNodes(): void;
@@ -90,6 +92,9 @@ class TimelineChart implements TimelineChartInterface {
   public tooltipInner: any;
   public tooltipClass = "tooltip";
 
+  public timeFactor: number = 3600000;
+  public timeRangeBase: number = 36000;
+
   /**
    * Constructor
    * @param dimension
@@ -138,7 +143,7 @@ class TimelineChart implements TimelineChartInterface {
     if (!timelineSvg) {
       timelineSvg = this.timelineSvg;
     }
-    var xScale = this.xScale = this.updateXAxis();
+    var xScale = this.xScale = this.updateXScale();
     var xAxis = d3.svg.axis()
       .scale(xScale)
       .orient("top")
@@ -156,10 +161,42 @@ class TimelineChart implements TimelineChartInterface {
     if (!chartSvg) {
       chartSvg = this.chartSvg;
     }
-    var ticks: number = 24 * 2;
+
+    var ticks: number = ((this.chartEnd.getTime() - this.chartStart.getTime()) / this.timeFactor) * 2;
+    var factor = this.chartRange / ticks;
+    var tickValues = _.range(0, factor * (ticks + 1), factor);
+
     var xGridScale = d3.scale.linear().domain([0, this.chartRange]).range([0, this.chartRange]);
-    var xGrid = d3.svg.axis().scale(xGridScale).orient("bottom").ticks(ticks).tickFormat("").tickSize(-this.chartRange, 0);
+    var xGrid = d3.svg.axis().scale(xGridScale).orient("bottom").tickFormat("").tickSize(-this.chartRange, 0).tickValues(tickValues);
+
     chartSvg.append("g").attr("class", "grid").attr("transform", "translate(0," + this.chartRange + ")").call(xGrid);
+  }
+
+  // TODO: working on 
+  public drawHGrid(chartSvg?: any): void {
+    if (!chartSvg) {
+      chartSvg = this.chartSvg;
+    }
+
+    
+    var ticks: number = Object.keys(this.aData).length; 
+    var tickValues: Array<number> = _.range(0, ticks * this.rowHeight, this.rowHeight);
+
+    var y = d3.scale.linear()
+      .domain([0, +this.height()])
+      .range([+this.height(), 0]);
+
+    var yAxis = d3.svg.axis()
+      .scale(y)
+      .tickSize(this.chartRange)
+      .tickValues(tickValues)
+      .tickFormat('')
+      .orient("right");
+
+    chartSvg.append("g")
+      .attr("class", "y axis")
+      .call(yAxis);
+
   }
 
   /**
@@ -217,11 +254,11 @@ class TimelineChart implements TimelineChartInterface {
    * Shall be called, after changing business hours, or chart width.
    * @returns {d3.time.Scale<any, number>}
    */
-  public updateXAxis(): any {
+  public updateXScale(): any {
     var start: number = this.chartStart.getTime();
     var end: number = this.chartEnd.getTime();
     if (! (isNaN(start) || isNaN(end))) {
-      this.chartRange = (end - start) / 36000;
+      this.chartRange = (end - start) / this.timeRangeBase;
       this.xScale = d3.time.scale().domain([start, end]).range([0, this.chartRange]);
     }
 
@@ -394,6 +431,7 @@ class TimelineChart implements TimelineChartInterface {
 
     // Timeline Grid
     this.drawGrid();
+    this.drawHGrid();
 
     // Save class reference
     var that = this;
@@ -494,7 +532,7 @@ class TimelineChart implements TimelineChartInterface {
     this.chartEnd = end;
 
     // Update x axis scaling
-    this.updateXAxis();
+    this.updateXScale();
   }
 
   /**
@@ -554,5 +592,9 @@ class TimelineChart implements TimelineChartInterface {
       return "opacity: 0;";
     });
     return this.tooltipInner;
+  }
+
+  public setChartRange(chartRange: number): void {
+    this.chartRange = chartRange;
   }
 }
