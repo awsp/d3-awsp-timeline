@@ -1,6 +1,7 @@
 ///<reference path="DefinitelyTyped/d3/d3.d.ts" />
 ///<reference path="DefinitelyTyped/underscore/underscore.d.ts" />
 ///<reference path="DefinitelyTyped/jquery/jquery.d.ts" />
+///<reference path="DefinitelyTyped/moment/moment.d.ts" />
 ///<reference path="Dimension.ts" />
 ///<reference path="TimelineGroup.ts" />
 /**
@@ -16,7 +17,8 @@ var TimelineChart = (function () {
         this.chartModuleDom = null;
         // Chart SVG, pointer to the actual SVG element.
         this.chartSvg = null;
-        // Storing Row Height, injectable from method.
+        // Date module
+        this.dateModule = null;
         this.rowHeight = 21;
         // Chart output range, default to 2400
         this.chartRange = 2400;
@@ -69,7 +71,7 @@ var TimelineChart = (function () {
         timelineSvg.attr("width", this.chartRange).attr("class", "changed").append("g").attr("class", "axis").attr("transform", "translate(0, " + (TimelineChart.timelineHeight - 1) + ")").call(xAxis);
     };
     /**
-     * Draw grid
+     * Draw vertical grid
      * @param chartSvg
      */
     TimelineChart.prototype.drawGrid = function (chartSvg) {
@@ -83,7 +85,10 @@ var TimelineChart = (function () {
         var xGrid = d3.svg.axis().scale(xGridScale).orient("bottom").tickFormat("").tickSize(-this.chartRange, 0).tickValues(tickValues);
         chartSvg.append("g").attr("class", "grid").attr("transform", "translate(0," + this.chartRange + ")").call(xGrid);
     };
-    // TODO: working on 
+    /**
+     * Draw horizontal grid
+     * @param chartSvg
+     */
     TimelineChart.prototype.drawHGrid = function (chartSvg) {
         if (!chartSvg) {
             chartSvg = this.chartSvg;
@@ -134,6 +139,13 @@ var TimelineChart = (function () {
         this.tooltipInner = this.tooltip.append("foreignObject").append("div").attr("class", "inner");
         this.chartModuleDom = chartModuleDom;
         this.chartSvg = chartSvg;
+    };
+    TimelineChart.prototype.drawDateModule = function () {
+        var _this = this;
+        this.dateModule = this.gParent.append("div").attr("class", TimelineChart.dateModuleClass).text(function () {
+            var start = _this.chartStart ? _this.chartStart : new Date();
+            return moment(start).format(TimelineChart.dateModuleFormat);
+        });
     };
     /**
      * This will re-calculate and update the current x axis scaling.
@@ -272,6 +284,8 @@ var TimelineChart = (function () {
      */
     TimelineChart.prototype.draw = function () {
         var _this = this;
+        // DateModule
+        this.drawDateModule();
         // Timeline SVG timeline
         this.drawTimeline();
         // Update SVG properties
@@ -335,6 +349,9 @@ var TimelineChart = (function () {
     };
     TimelineChart.prototype.clearGrid = function () {
         this.chartSvg.selectAll("g.grid").remove();
+    };
+    TimelineChart.prototype.clearDateModule = function () {
+        this.gParent.selectAll("div." + TimelineChart.dateModuleClass).remove();
     };
     /**
      * Default data-binding on labels
@@ -414,6 +431,8 @@ var TimelineChart = (function () {
     };
     // Timeline CSS Class Name, used to do some jQuery stuff.
     TimelineChart.scrollableTimelineClass = "timeline-scrollable";
+    TimelineChart.dateModuleClass = "date-module";
+    TimelineChart.dateModuleFormat = "YYYY/MM/DD";
     // Timeline Div Height
     TimelineChart.timelineHeight = 21;
     return TimelineChart;

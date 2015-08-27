@@ -114,6 +114,7 @@ var TimelineScheduler = (function () {
         this.chart.clearNodes();
         this.chart.clearTimeline();
         this.chart.clearGrid();
+        this.chart.clearDateModule();
         this.grouping.clearNodes();
     };
     /**
@@ -152,5 +153,6 @@ var TimelineScheduler = (function () {
     TimelineScheduler.scheduleInnerClass = "scheduler-inner";
     TimelineScheduler.listModuleClass = "list-module";
     TimelineScheduler.chartTimelineClass = "chart-timeline";
+    TimelineScheduler.currentDateModuleClass = "chart-date";
     return TimelineScheduler;
 })();

@@ -8,6 +8,9 @@
 @timelineColor: #aaa;
 @hGridColor: #ddd;
 @vGridColor: #f4f4f4;
+@schedulerInnerBackground: #f2f2f2;
+@tooltipWidth: 320px;
+@tooltipHeight: 100px;
 
 
 /* Common Classes */
@@ -57,7 +60,15 @@ body {
   .scheduler-inner {
     width: 100%;
     height: 100%;
-    background: @borderColor;
+    background: @schedulerInnerBackground;
+    .relative;
+
+    .date-module {
+      .absolute;
+      top: 0;
+      left: 4px;
+      font-size: 12px;
+    }
   }
 
   .list-module {
@@ -71,8 +82,8 @@ body {
     left: 0;
     top: 0;
     z-index: 1000;
-    width: 320px;
-    height: 100px;
+    width: @tooltipWidth;
+    height: @tooltipHeight;
     background: @tooltipBackground;
     border: 1px solid @tooltipBorderColor;
     border-radius: 3px;

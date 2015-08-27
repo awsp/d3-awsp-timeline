@@ -25,6 +25,7 @@ class TimelineScheduler {
   public static scheduleInnerClass: string = "scheduler-inner";
   public static listModuleClass: string = "list-module";
   public static chartTimelineClass: string = "chart-timeline";
+  public static currentDateModuleClass: string = "chart-date";
 
   public constructor(target: string, dimension: Dimension, data: any, chart: TimelineChartInterface, grouping: TimelineGroupInterface) {
     if (!target || !dimension || !chart || !grouping) {
@@ -150,6 +151,7 @@ class TimelineScheduler {
     this.chart.clearNodes();
     this.chart.clearTimeline();
     this.chart.clearGrid();
+    this.chart.clearDateModule();
     this.grouping.clearNodes();
   }
 
@@ -187,5 +189,4 @@ class TimelineScheduler {
     // Update its g data-x, data-y
     // Update its identifier(id)
   }
-
 }

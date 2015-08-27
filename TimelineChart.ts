@@ -1,6 +1,7 @@
 ///<reference path="DefinitelyTyped/d3/d3.d.ts" />
 ///<reference path="DefinitelyTyped/underscore/underscore.d.ts" />
 ///<reference path="DefinitelyTyped/jquery/jquery.d.ts" />
+///<reference path="DefinitelyTyped/moment/moment.d.ts" />
 ///<reference path="Dimension.ts" />
 ///<reference path="TimelineGroup.ts" />
 
@@ -13,6 +14,7 @@ interface TimelineChartInterface {
   drawBlocks(blockG: any): void;
   drawGrid(chartSvg?: any): void;
   drawHGrid(chartSvg?: any): void;
+  drawDateModule(): void;
 
   setDate(date: string): void;
   setBusinessHours(start: Date, end: Date): void;
@@ -33,6 +35,7 @@ interface TimelineChartInterface {
   clearNodes(): void;
   clearTimeline(): void;
   clearGrid(): void;
+  clearDateModule(): void;
 
   showTooltip(currentInstance: any): any;
   hideTooltip(): any;
@@ -58,7 +61,9 @@ class TimelineChart implements TimelineChartInterface {
   // Chart SVG, pointer to the actual SVG element.
   public chartSvg: any = null;
 
-  // Storing Row Height, injectable from method.
+  // Date module
+  public dateModule: any = null;
+
   protected rowHeight: number = 21;
 
   // Storing Current Height
@@ -69,6 +74,8 @@ class TimelineChart implements TimelineChartInterface {
 
   // Timeline CSS Class Name, used to do some jQuery stuff.
   public static scrollableTimelineClass: string = "timeline-scrollable";
+  public static dateModuleClass: string = "date-module";
+  public static dateModuleFormat: string = "YYYY/MM/DD";
 
   // Timeline Div Height
   public static timelineHeight: number = 21;
@@ -154,7 +161,7 @@ class TimelineChart implements TimelineChartInterface {
   }
 
   /**
-   * Draw grid
+   * Draw vertical grid
    * @param chartSvg
    */
   public drawGrid(chartSvg?: any): void {
@@ -172,7 +179,10 @@ class TimelineChart implements TimelineChartInterface {
     chartSvg.append("g").attr("class", "grid").attr("transform", "translate(0," + this.chartRange + ")").call(xGrid);
   }
 
-  // TODO: working on 
+  /**
+   * Draw horizontal grid
+   * @param chartSvg
+   */
   public drawHGrid(chartSvg?: any): void {
     if (!chartSvg) {
       chartSvg = this.chartSvg;
@@ -247,6 +257,14 @@ class TimelineChart implements TimelineChartInterface {
 
     this.chartModuleDom = chartModuleDom;
     this.chartSvg = chartSvg;
+  }
+
+  public drawDateModule(): void {
+    this.dateModule = this.gParent.append("div").attr("class", TimelineChart.dateModuleClass)
+      .text(() => {
+        var start = this.chartStart ? this.chartStart : new Date();
+        return moment(start).format(TimelineChart.dateModuleFormat);
+      });
   }
 
   /**
@@ -422,6 +440,9 @@ class TimelineChart implements TimelineChartInterface {
    * Draw actual data onto the chart!
    */
   public draw(): void {
+    // DateModule
+    this.drawDateModule();
+
     // Timeline SVG timeline
     this.drawTimeline();
 
@@ -510,6 +531,10 @@ class TimelineChart implements TimelineChartInterface {
 
   public clearGrid(): void {
     this.chartSvg.selectAll("g.grid").remove();
+  }
+
+  public clearDateModule(): void {
+    this.gParent.selectAll("div." + TimelineChart.dateModuleClass).remove();
   }
 
   /**
