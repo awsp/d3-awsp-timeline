@@ -143,7 +143,8 @@ var TimelineChart = (function () {
     TimelineChart.prototype.drawDateModule = function () {
         var _this = this;
         this.dateModule = this.gParent.append("div").attr("class", TimelineChart.dateModuleClass).text(function () {
-            return moment(_this.chartStart).format("YYYY/MM/DD");
+            var start = _this.chartStart ? _this.chartStart : new Date();
+            return moment(start).format(TimelineChart.dateModuleFormat);
         });
     };
     /**
@@ -431,6 +432,7 @@ var TimelineChart = (function () {
     // Timeline CSS Class Name, used to do some jQuery stuff.
     TimelineChart.scrollableTimelineClass = "timeline-scrollable";
     TimelineChart.dateModuleClass = "date-module";
+    TimelineChart.dateModuleFormat = "YYYY/MM/DD";
     // Timeline Div Height
     TimelineChart.timelineHeight = 21;
     return TimelineChart;

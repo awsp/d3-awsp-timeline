@@ -75,6 +75,7 @@ class TimelineChart implements TimelineChartInterface {
   // Timeline CSS Class Name, used to do some jQuery stuff.
   public static scrollableTimelineClass: string = "timeline-scrollable";
   public static dateModuleClass: string = "date-module";
+  public static dateModuleFormat: string = "YYYY/MM/DD";
 
   // Timeline Div Height
   public static timelineHeight: number = 21;
@@ -261,7 +262,8 @@ class TimelineChart implements TimelineChartInterface {
   public drawDateModule(): void {
     this.dateModule = this.gParent.append("div").attr("class", TimelineChart.dateModuleClass)
       .text(() => {
-        return moment(this.chartStart).format("YYYY/MM/DD");
+        var start = this.chartStart ? this.chartStart : new Date();
+        return moment(start).format(TimelineChart.dateModuleFormat);
       });
   }
 
