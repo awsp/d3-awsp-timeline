@@ -72,7 +72,14 @@ body {
 .scheduler-module .scheduler-inner {
   width: 100%;
   height: 100%;
-  background: #cccccc;
+  background: #f2f2f2;
+  position: relative;
+}
+.scheduler-module .scheduler-inner .date-module {
+  position: absolute;
+  top: 0;
+  left: 4px;
+  font-size: 12px;
 }
 .scheduler-module .list-module {
   float: left;

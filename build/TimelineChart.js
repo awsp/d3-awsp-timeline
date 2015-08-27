@@ -1,6 +1,7 @@
 ///<reference path="DefinitelyTyped/d3/d3.d.ts" />
 ///<reference path="DefinitelyTyped/underscore/underscore.d.ts" />
 ///<reference path="DefinitelyTyped/jquery/jquery.d.ts" />
+///<reference path="DefinitelyTyped/moment/moment.d.ts" />
 ///<reference path="Dimension.ts" />
 ///<reference path="TimelineGroup.ts" />
 /**
@@ -16,7 +17,8 @@ var TimelineChart = (function () {
         this.chartModuleDom = null;
         // Chart SVG, pointer to the actual SVG element.
         this.chartSvg = null;
-        // Storing Row Height, injectable from method.
+        // Date module
+        this.dateModule = null;
         this.rowHeight = 21;
         // Chart output range, default to 2400
         this.chartRange = 2400;
@@ -137,6 +139,12 @@ var TimelineChart = (function () {
         this.tooltipInner = this.tooltip.append("foreignObject").append("div").attr("class", "inner");
         this.chartModuleDom = chartModuleDom;
         this.chartSvg = chartSvg;
+    };
+    TimelineChart.prototype.drawDateModule = function () {
+        var _this = this;
+        this.dateModule = this.gParent.append("div").attr("class", TimelineChart.dateModuleClass).text(function () {
+            return moment(_this.chartStart).format("YYYY/MM/DD");
+        });
     };
     /**
      * This will re-calculate and update the current x axis scaling.
@@ -275,6 +283,8 @@ var TimelineChart = (function () {
      */
     TimelineChart.prototype.draw = function () {
         var _this = this;
+        // DateModule
+        this.drawDateModule();
         // Timeline SVG timeline
         this.drawTimeline();
         // Update SVG properties
@@ -338,6 +348,9 @@ var TimelineChart = (function () {
     };
     TimelineChart.prototype.clearGrid = function () {
         this.chartSvg.selectAll("g.grid").remove();
+    };
+    TimelineChart.prototype.clearDateModule = function () {
+        this.gParent.selectAll("div." + TimelineChart.dateModuleClass).remove();
     };
     /**
      * Default data-binding on labels
@@ -417,6 +430,7 @@ var TimelineChart = (function () {
     };
     // Timeline CSS Class Name, used to do some jQuery stuff.
     TimelineChart.scrollableTimelineClass = "timeline-scrollable";
+    TimelineChart.dateModuleClass = "date-module";
     // Timeline Div Height
     TimelineChart.timelineHeight = 21;
     return TimelineChart;
